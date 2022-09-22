@@ -3,8 +3,6 @@ package com.sgen.kafkastreams.app;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.github.javafaker.Faker;
-
 @SpringBootApplication
 public class KafkaStreamsBigDataMoveApplication {
 
