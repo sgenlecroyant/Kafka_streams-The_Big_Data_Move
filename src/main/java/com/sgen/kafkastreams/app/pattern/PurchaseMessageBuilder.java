@@ -2,6 +2,7 @@ package com.sgen.kafkastreams.app.pattern;
 
 import java.time.LocalDateTime;
 
+import com.sgen.kafkastreams.app.broker.message.PurchaseMessage;
 import com.sgen.kafkastreams.app.model.Purchase;
 
 public class PurchaseMessageBuilder {
@@ -41,6 +42,8 @@ public class PurchaseMessageBuilder {
 		return location;
 	}
 	
-	
+	public PurchaseMessage build() {
+		return new PurchaseMessage(this);
+	}
 
 }
