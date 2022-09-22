@@ -1,0 +1,2 @@
+# Kafka_streams-The_Big_Data_Move
+In this project, i will be demonstrating how Kafka Streams fits into the Big Data area and the kinds of capabilities Kafka Streams has which can be considered as the Big pros for Kafka Streams over the other existing technologies in the game like Apache Flink, Hadoop, NiFi and Apache Spark Streaming. The language I will be using is Java and MAVEN as my project build and dependency management tool.
