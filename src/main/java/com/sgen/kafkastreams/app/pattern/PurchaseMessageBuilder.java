@@ -14,7 +14,12 @@ public class PurchaseMessageBuilder {
 	private String location;
 	
 	public PurchaseMessageBuilder(Purchase purchase) {
-//
+		this.id = purchase.getId();
+		this.itemName = purchase.getItemName();
+		this.quantity = purchase.getQuantity();
+		this.amount = purchase.getAmount();
+		this.dateTime = purchase.getDateTime();
+		this.location = purchase.getLocation();
 	}
 	
 	public Integer getId() {

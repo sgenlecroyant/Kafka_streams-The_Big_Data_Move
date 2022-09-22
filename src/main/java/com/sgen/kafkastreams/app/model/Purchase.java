@@ -38,7 +38,7 @@ public class Purchase {
 		return amount;
 	}
 
-	public LocalDateTime getDate() {
+	public LocalDateTime getDateTime() {
 		return dateTime;
 	}
 
