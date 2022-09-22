@@ -51,5 +51,17 @@
 ***
 
         1. I will be using some cool design patterns like BUILDER DESIGN PATTERN, SINGLETON DESIGN PATTERN, FACADE DESIGN PATTERN and MANY MORE whenever we find that we really need any, this can improve the flexibility and make our streaming application a lot more robust against FUTURE BREAKING CHANGES.
-        
+
         2. I will be some TDD(Test-Driven-Development) practices whenever it sounds necessary and do testing with TEST-CONTAINERS at the end of our journey
+
+
+<h2 style="color: green">The Licensing:  </h2> <hr>
+
+> The entire project is under the GNU license: learn more about GNU [HERE](https://www.google.com) in case you don't know about it.
+
+<!--Need to google to see if Kafka and Kafka Streams are GNU or MIT>
+-->
+
+<span style="color:red; text-align:center"> Feel free to hit me up on any of these platforms below</span>
+
+Facebook Twitter Linkedin Gmail Instagram
