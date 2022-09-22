@@ -39,6 +39,7 @@ class PurchaseMessageBuilderTest {
 				.build();
 		
 		assertThat(purchaseMessage.getLocation()).isEqualTo(purchase.getLocation());
+		assertThat(purchaseMessage).hasNoNullFieldsOrProperties();
 	}
 
 }
