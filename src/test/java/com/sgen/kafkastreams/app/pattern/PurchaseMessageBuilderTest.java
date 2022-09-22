@@ -41,5 +41,35 @@ class PurchaseMessageBuilderTest {
 		assertThat(purchaseMessage.getLocation()).isEqualTo(purchase.getLocation());
 		assertThat(purchaseMessage).hasNoNullFieldsOrProperties();
 	}
+	
+	@Test
+	@DisplayName("FAILURE_PURCHASE_MESSAGE_BUILDER")
+
+	// @formatter:off
+	void testFailurePurchaseMessageBuilder() {
+		String itemName = "HUAWEI";
+		Integer id = 1000;
+		double amount = 2500;
+		LocalDateTime dateTime = LocalDateTime.now();
+		String location = "TEXAS";
+		Integer quantity = 23;
+		
+		Purchase purchase = 
+				Purchase.builder()
+				.id(id)
+				.itemName(null)
+				.amount(amount)
+				.dateTime(dateTime)
+				.location(location)
+				.quantity(quantity)
+				.build();
+		
+		PurchaseMessage purchaseMessage = 
+				PurchaseMessage.builder(purchase)
+				.build();
+		
+		assertThat(purchaseMessage.getLocation()).isEqualTo(purchase.getLocation());
+		assertThat(purchaseMessage).hasNoNullFieldsOrPropertiesExcept("itemName");
+	}
 
 }
