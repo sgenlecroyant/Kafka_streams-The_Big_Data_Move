@@ -12,8 +12,8 @@ import com.sgen.kafkastreams.app.model.Purchase;
 class PurchaseBuilderTest {
 
 	@Test
-	@DisplayName("TEST PURCHASE BUILDER PATTERN")
-	void testBuild() {
+	@DisplayName("SUCCESS TEST: PURCHASE BUILDER PATTERN")
+	void testSuccessBuilderPattern() {
 
 		// Given
 		// @formatter:off
@@ -36,5 +36,31 @@ class PurchaseBuilderTest {
 		assertThat(purchase).matches((pchase) -> pchase.getLocation().equals(location));
 		assertThat(purchase).hasNoNullFieldsOrProperties();
 	}
+	
+	@Test
+	@DisplayName("FAILURE TEST: PURCHASE BUILDER PATTERN")
+	void testFailBuilderPattern() {
+
+		// Given
+		// @formatter:off
+		String itemName = "BOKA";
+		String location = "NewYork City";
+		int quantity = 23;
+		int amount = 1000;
+		Purchase purchase = 
+				Purchase
+				.builder()
+				.itemName(itemName)
+				.amount(amount)
+				.dateTime(LocalDateTime.now())
+				.location(location)
+				.quantity(quantity)
+				.build();
+		// When
+//		assertThat(purchase.getLocation()).isEqualTo(location);
+		assertThat(purchase).matches((pchase) -> pchase.getLocation().equals(location));
+		assertThat(purchase).hasNoNullFieldsOrPropertiesExcept("id");
+	}
+
 
 }
