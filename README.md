@@ -39,7 +39,7 @@
 <div class="reference">
 
 ***You can refer to to this 
-<a href="https://www.github.com/sgenlecroyant/Kafka_streams-The_Big_Data_Move/blob/master/LICENSE"> link
+<a style="text-decoration: none; color: orange;" href="https://github.com/sgenlecroyant/Kafka_streams-The_Big_Data_Move/blob/master/PROJECT.md"> link
 </a>
 for more details about how you can seamlessly 
 run this app to avoid confusion***
