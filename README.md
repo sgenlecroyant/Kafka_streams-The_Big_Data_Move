@@ -114,4 +114,6 @@ run this app to avoid confusion***
 <a href="https://www.instagram.com/sgenlecroyant/">
 <img width="20" src="./src/main/resources/assets/images/instagram-svgrepo-com.svg"/>
 </a>
+
+<img src="./readme_styles.svg" with="20px" height="20px"/>
 </div>
