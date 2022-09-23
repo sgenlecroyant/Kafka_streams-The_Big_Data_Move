@@ -3,6 +3,7 @@
         <div xmlns="http://www.w3.org/1999/xhtml">
             <style>
             h1 {
+                font-size: 40px;
                 color: red;
                 animation: mymove 2s infinite;
             }
@@ -12,7 +13,7 @@
                     color: red;
                 }
                 to {
-                    color: yellow;
+                    color: green;
                 }
             }
             </style>
