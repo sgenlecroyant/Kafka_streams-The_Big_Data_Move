@@ -12,12 +12,40 @@
         3. Some BASH SCRIPTING knowledge to automate Kafka topics creation
         Technologies used in this project:
 
-        ==> The Java Language, Apache MAVEN, The FAKER API to generate realistic data that we will need to simulate the streaming processing power of our application, Docker, Apache KAFKA and KAFKA STREAMS itself
+        ==> The Java Language, Apache MAVEN, The FAKER API to generate realistic data that we will need to simulate the streaming processing power of our application, Docker, Apache KAFKA and KAFKA STREAMS itself.
+        
+<div class="reference">
+
+***You can refer to to this 
+[link]('https://www.github.com/sgenlecroyant/Kafka_streams-The_Big_Data_Move/blob/master/LICENSE') 
+for more details about how you can seamlessly 
+run this app to avoid confusion***
+
+</div>
 
 > In this project, i will be demonstrating how Kafka Streams fits into the Big Data area and the kinds of capabilities Kafka Streams has which can be considered as the Big pros for Kafka Streams over the other existing technologies in the game like Apache Flink, Hadoop, NiFi and Apache Spark Streaming. The language I will be using is Java and MAVEN as my project build and dependency management tool.
 
 <br>
 <br>
+
+<style> 
+.connect > a {
+        padding: 0px 10px;
+}
+
+.warming_message {
+        padding: 8x;
+        margin: 20px;
+}
+
+.reference {
+        color: red;
+        background-color: black;
+        text-align: center;
+        padding: 10px 10px;
+        margin: 10px 10px;
+}
+</style>
 
 >
 <h1 align="center" style="font-family:bold">        What you need to know about this project and KAFKA STREAMS
@@ -52,16 +80,33 @@
 
         1. I will be using some cool design patterns like BUILDER DESIGN PATTERN, SINGLETON DESIGN PATTERN, FACADE DESIGN PATTERN and MANY MORE whenever we find that we really need any, this can improve the flexibility and make our streaming application a lot more robust against FUTURE BREAKING CHANGES.
 
-        2. I will be some TDD(Test-Driven-Development) practices whenever it sounds necessary and do testing with TEST-CONTAINERS at the end of our journey
+        2. I will be some TDD(Test-Driven-Development) practices whenever it sounds necessary and do testing with TEST-CONTAINERS at the end of our journey.
 
 
-<h2 style="color: green">The Licensing:  </h2> <hr>
+<h2 style="background-color: black;color: green; font-weight: 900; font-size:3rem">The Licensing:  </h2> <hr>
 
-> The entire project is under the GNU license: learn more about GNU [HERE](https://www.google.com) in case you don't know about it.
+> The entire project is under the Apache License 2.0, in compliance with Kafka and Kafka Streams License: learn more about Apache License Version 2 [HERE](https://www.apache.org/licenses/LICENSE-2.0) in case you don't know about it.
 
 <!--Need to google to see if Kafka and Kafka Streams are GNU or MIT>
 -->
 
-<span style="color:red; text-align:center"> Feel free to hit me up on any of these platforms below</span>
+<div class="warming_message" style="color:cyan; text-align:center; background-color:black"> Feel free to hit me up on any of these platforms below</div>
 
-Facebook Twitter Linkedin Gmail Instagram
+<div class="connect" align="center">
+
+<a href="https://www.facebook.com/sgenlecroyant">
+<img width="20" src="./src/main/resources/assets/images/facebook-svgrepo-com.svg"/>
+</a>
+<a href="https://www.twitter.com/sgenlecroyant">
+<img width="20" src="./src/main/resources/assets/images/twitter-svgrepo-com.svg"/>
+</a>
+<a href="https://www.linkedin.com/in/sgenlecroyant">
+<img width="20" src="./src/main/resources/assets/images/linkedin-svgrepo-com.svg"/>
+</a>
+<a href="mailto:sgenlecroyant@gmail.com">
+<img width="20" src="./src/main/resources/assets/images/gmail-svgrepo-com.svg"/>
+</a>
+<a href="https://www.instagram.com/sgenlecroyant/">
+<img width="20" src="./src/main/resources/assets/images/instagram-svgrepo-com.svg"/>
+</a>
+</div>
