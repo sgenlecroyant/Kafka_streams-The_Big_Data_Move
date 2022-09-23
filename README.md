@@ -17,7 +17,8 @@
 <div class="reference">
 
 ***You can refer to to this 
-[link]('https://www.github.com/sgenlecroyant/Kafka_streams-The_Big_Data_Move/blob/master/LICENSE') 
+<a href="https://www.github.com/sgenlecroyant/Kafka_streams-The_Big_Data_Move/blob/master/LICENSE"> link
+</a>
 for more details about how you can seamlessly 
 run this app to avoid confusion***
 
