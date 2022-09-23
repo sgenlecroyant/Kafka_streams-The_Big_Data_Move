@@ -1,3 +1,25 @@
+
+<style> 
+.connect > a {
+        padding: 0px 10px;
+}
+
+.warming_message {
+        padding: 8x;
+        margin: 20px;
+}
+
+.reference {
+        color: red;
+        background-color: black;
+        text-align: center;
+        padding: 10px 10px;
+        margin: 10px 10px;
+}
+</style>
+
+
+
 <h3 align="center" style="color: cyan; background-color: black">Kafka_streams-The_Big_Data_Move<h3>
 
 ***
@@ -29,24 +51,6 @@ run this app to avoid confusion***
 <br>
 <br>
 
-<style> 
-.connect > a {
-        padding: 0px 10px;
-}
-
-.warming_message {
-        padding: 8x;
-        margin: 20px;
-}
-
-.reference {
-        color: red;
-        background-color: black;
-        text-align: center;
-        padding: 10px 10px;
-        margin: 10px 10px;
-}
-</style>
 
 >
 <h1 align="center" style="font-family:bold">        What you need to know about this project and KAFKA STREAMS
