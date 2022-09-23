@@ -6,6 +6,7 @@
                 font-size: 40px;
                 color: red;
                 animation: mymove 2s infinite;
+                margin: 20px;
             }
 
             @keyframes mymove {
