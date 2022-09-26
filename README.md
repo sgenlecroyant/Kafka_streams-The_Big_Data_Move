@@ -1,4 +1,6 @@
 
+<!-- 
+
 <style> 
 .connect > a {
         padding: 0px 10px;
@@ -17,12 +19,12 @@
         margin: 10px 10px;
 }
 </style>
-
+-->
 
 
 <h3 align="center" style="color: cyan; background-color: black">Kafka_streams-The_Big_Data_Move<h3>
 
-Make sure you have read the <a href=""> `PROJECT.md` </a> file for some other reference of information related to this project.
+Make sure you have read the <a href="https://github.com/sgenlecroyant/Kafka_streams-The_Big_Data_Move/blob/master/PROJECT.md"> `PROJECT.md` </a> file for some other reference of information related to this project.
 
 ***
 ***     

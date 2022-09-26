@@ -1,6 +1,6 @@
 <p align="center"> Welcome to this project specific details</p>
 
-Make sure you have read the <a href=""> `README` </a> file for some other reference of information related to this project.
+Make sure you have read the <a href="https://github.com/sgenlecroyant/Kafka_streams-The_Big_Data_Move/blob/master/README.md"> `README` </a> file for some other reference of information related to this project.
 
 ## Here you find necessary scripts that you will need to execute to start using this project
 > 0. I won't dive into explaining about bash scripting here, just the basics can help.
