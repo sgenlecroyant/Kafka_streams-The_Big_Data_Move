@@ -22,6 +22,8 @@
 
 <h3 align="center" style="color: cyan; background-color: black">Kafka_streams-The_Big_Data_Move<h3>
 
+Make sure you have read the <a href=""> `PROJECT.md` </a> file for some other reference of information related to this project.
+
 ***
 ***     
         What you need in other to run this data streaming application:
