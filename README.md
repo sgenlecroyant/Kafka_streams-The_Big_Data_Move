@@ -33,10 +33,10 @@ Make sure you have read the <a href="https://github.com/sgenlecroyant/Kafka_stre
 > 1. JAVA: Installed on your local machine, because I will not containerize this application, just for simplicity.
 
 > 2. DOCKER: To get our Kafka and Zookeeper Servers up and running quickly.
-            ==> You need to know a little bit about Docker and how to create persistent containers so you don't loose your data in case you wanna play with your data
+ ==> You need to know a little bit about Docker and how to create persistent containers so you don't loose your data in case you wanna play with your data
 
 > 3. Some BASH SCRIPTING knowledge to automate Kafka topics creation
-        Technologies used in this project:
+Technologies used in this project:
 >
 > ==> The Java Language, Apache MAVEN, The FAKER API to generate realistic data that we will need to simulate the streaming processing power of our application, Docker, Apache KAFKA and KAFKA STREAMS itself.
         
