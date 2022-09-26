@@ -51,6 +51,7 @@ public class Purchase {
 		return new PurchaseBuilder();
 	}
 	
+	// with data coming from an external source: VERY IMPORTANT
 	public static PurchaseBuilder newBuilder(Purchase purchase) {
 		return new PurchaseBuilder(purchase);
 	}

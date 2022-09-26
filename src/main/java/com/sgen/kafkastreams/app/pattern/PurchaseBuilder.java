@@ -20,16 +20,13 @@ public class PurchaseBuilder {
 	}
 
 	public PurchaseBuilder(Purchase purchase) {
-
-		this.newPurchase = 
-				Purchase.builder()
-				.id(purchase.getId())
-				.itemName(purchase.getItemName())
-				.amount(purchase.getAmount())
-				.quantity(purchase.getQuantity())
-				.dateTime(purchase.getDateTime())
-				.location(purchase.getLocation())
-				.build();
+		this.id = purchase.getId();
+		this.itemName = purchase.getItemName();
+		this.amount = purchase.getAmount();
+		this.dateTime = purchase.getDateTime();
+		this.location = purchase.getLocation();
+		this.quantity = purchase.getQuantity();
+		System.out.println("\uD83D\uDE00");
 	}
 
 	public PurchaseBuilder id(Integer id) {
@@ -88,10 +85,6 @@ public class PurchaseBuilder {
 
 	public Purchase build() {
 		return new Purchase(this);
-	}
-
-	public Purchase buildNew() {
-		return this.newPurchase;
 	}
 
 }

@@ -73,11 +73,11 @@ class PurchaseBuilderTest {
 				.amount(1200)
 				.quantity(34)
 				.dateTime(LocalDateTime.now())
-				.location("lOcation")
+				.location("location")
 				.build();
 		Purchase newPurchase = 
 				Purchase.newBuilder(purchase)
-				.buildNew();
+				.build();
 		
 		assertThat(newPurchase.getId()).isEqualTo(purchase.getId());
 		
