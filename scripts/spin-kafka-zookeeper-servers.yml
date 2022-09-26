@@ -1,0 +1,65 @@
+version: '3.7'
+
+services:
+  KAFKA:
+    image: bitnami/kafka:latest
+    container_name: KAFKA
+
+    deploy:
+      resources:
+        limits:
+          cpus: 0.30
+          memory: 512M
+        reservations:
+          cpus: 0.25
+          memory: 512M
+    
+    ports:
+      - 9092:9092
+    networks:
+      - NORMAL_NETWORK
+
+    environment:
+      - KAFKA_ZOOKEEPER_CONNECT=ZOOKEEPER:2181
+      - KAFKA_BROKER_ID=10
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+            #   THIS IS THE NEW CONFIG: DELETABLE
+      # - KAFKA_LISTENERS= EXTERNAL_SAME_HOST://:29092,INTERNAL://:9092
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://127.0.0.1:9092
+            #   THIS IS THE NEW CONFIG: DELETABLE
+      # - KAFKA_ADVERTISED_LISTENERS=INTERNAL://KAFKA:9092,EXTERNAL_SAME_HOST://localhost:29092
+      #   THIS IS THE NEW CONFIG: DELETABLE
+      # - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=INTERNAL:PLAINTEXT,EXTERNAL_SAME_HOST:PLAINTEXT
+      - ALLOW_PLAINTEXT_LISTENER=true
+      # NEW CONFIG: DELETABLE
+      # - KAFKA_INTER_BROKER_LISTENER_NAME=INTERNAL
+
+    depends_on:
+      - ZOOKEEPER
+
+
+  ZOOKEEPER:
+    image: bitnami/zookeeper:latest
+    container_name: ZOOKEEPER
+
+    deploy:
+      resources:
+        limits:
+          cpus: 0.30
+          memory: 512M
+        reservations:
+          cpus: 0.25
+          memory: 512M
+    networks:
+      - NORMAL_NETWORK
+
+    ports:
+      - 2181:2181
+
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+
+  
+networks:
+  NORMAL_NETWORK:
+    name: KAFKA_NORMAL_NET
