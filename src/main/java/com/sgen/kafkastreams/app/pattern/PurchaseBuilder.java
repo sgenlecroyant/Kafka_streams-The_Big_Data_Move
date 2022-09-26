@@ -26,7 +26,6 @@ public class PurchaseBuilder {
 		this.dateTime = purchase.getDateTime();
 		this.location = purchase.getLocation();
 		this.quantity = purchase.getQuantity();
-		System.out.println("\uD83D\uDE00");
 	}
 
 	public PurchaseBuilder id(Integer id) {
