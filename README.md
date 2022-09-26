@@ -28,17 +28,17 @@ Make sure you have read the <a href="https://github.com/sgenlecroyant/Kafka_stre
 
 ***
 ***     
-        What you need in other to run this data streaming application:
+> What you need in other to run this data streaming application:
 
-        1. JAVA: Installed on your local machine, because I will not containerize this application, just for simplicity.
+> 1. JAVA: Installed on your local machine, because I will not containerize this application, just for simplicity.
 
-        2. DOCKER: To get our Kafka and Zookeeper Servers up and running quickly.
+> 2. DOCKER: To get our Kafka and Zookeeper Servers up and running quickly.
             ==> You need to know a little bit about Docker and how to create persistent containers so you don't loose your data in case you wanna play with your data
 
-        3. Some BASH SCRIPTING knowledge to automate Kafka topics creation
+> 3. Some BASH SCRIPTING knowledge to automate Kafka topics creation
         Technologies used in this project:
-
-        ==> The Java Language, Apache MAVEN, The FAKER API to generate realistic data that we will need to simulate the streaming processing power of our application, Docker, Apache KAFKA and KAFKA STREAMS itself.
+>
+> ==> The Java Language, Apache MAVEN, The FAKER API to generate realistic data that we will need to simulate the streaming processing power of our application, Docker, Apache KAFKA and KAFKA STREAMS itself.
         
 <div class="reference">
 
@@ -78,18 +78,18 @@ run this app to avoid confusion***
 > ### **About the language and programming principles for best practices to improve readability, maintainability and performance**
 
         
-        1. I will be using Java as the programming language
-        2. I will be coding so much to interfaces and abstraction for loose-coupling
-        3. I will be using both Object-Oriented programming and Functional Programming
-        4. I will be coding some threads using the Java multithreaded programming to improve performance whenever possible( when Speed is critical)
+> 1. I will be using Java as the programming language
+> 2. I will be coding so much to interfaces and abstraction for loose-coupling
+> 3. I will be using both Object-Oriented programming and Functional Programming
+> 4. I will be coding some threads using the Java multithreaded programming to improve performance whenever possible( when Speed is critical)
 
 <h2 style="text-align:center; font-weight:bold">More importantly <h2>
 
 ***
 
-        1. I will be using some cool design patterns like BUILDER DESIGN PATTERN, SINGLETON DESIGN PATTERN, FACADE DESIGN PATTERN and MANY MORE whenever we find that we really need any, this can improve the flexibility and make our streaming application a lot more robust against FUTURE BREAKING CHANGES.
+> 1. I will be using some cool design patterns like BUILDER DESIGN PATTERN, SINGLETON DESIGN PATTERN, FACADE DESIGN PATTERN and MANY MORE whenever we find that we really need any, this can improve the flexibility and make our streaming application a lot more robust against FUTURE BREAKING CHANGES.
 
-        2. I will be some TDD(Test-Driven-Development) practices whenever it sounds necessary and do testing with TEST-CONTAINERS at the end of our journey.
+> 2. I will be some TDD(Test-Driven-Development) practices whenever it sounds necessary and do testing with TEST-CONTAINERS at the end of our journey.
 
 
 <h2 style="background-color: black;color: green; font-weight: 900; font-size:3rem">The Licensing:  </h2> <hr>
