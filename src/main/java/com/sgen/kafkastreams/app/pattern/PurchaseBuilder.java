@@ -13,8 +13,23 @@ public class PurchaseBuilder {
 	private LocalDateTime dateTime;
 	private String location;
 
+	private Purchase newPurchase;
+
 	public PurchaseBuilder() {
 		// TODO Auto-generated constructor stub
+	}
+
+	public PurchaseBuilder(Purchase purchase) {
+
+		this.newPurchase = 
+				Purchase.builder()
+				.id(purchase.getId())
+				.itemName(purchase.getItemName())
+				.amount(purchase.getAmount())
+				.quantity(purchase.getQuantity())
+				.dateTime(purchase.getDateTime())
+				.location(purchase.getLocation())
+				.build();
 	}
 
 	public PurchaseBuilder id(Integer id) {
@@ -73,6 +88,10 @@ public class PurchaseBuilder {
 
 	public Purchase build() {
 		return new Purchase(this);
+	}
+
+	public Purchase buildNew() {
+		return this.newPurchase;
 	}
 
 }

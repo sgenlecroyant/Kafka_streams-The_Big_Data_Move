@@ -61,6 +61,33 @@ class PurchaseBuilderTest {
 		assertThat(purchase).matches((pchase) -> pchase.getLocation().equals(location));
 		assertThat(purchase).hasNoNullFieldsOrPropertiesExcept("id");
 	}
+	
+	@Test
+	@DisplayName("NEW BUILDER: WITH EXTERNAL SOURCE")
+	public void testNewBuilderMethod() {
+		
+		Purchase purchase = 
+				Purchase.builder()
+				.id(1000)
+				.itemName("ItemName")
+				.amount(1200)
+				.quantity(34)
+				.dateTime(LocalDateTime.now())
+				.location("lOcation")
+				.build();
+		Purchase newPurchase = 
+				Purchase.newBuilder(purchase)
+				.buildNew();
+		
+		assertThat(newPurchase.getId()).isEqualTo(purchase.getId());
+		
+		assertThat(newPurchase.getItemName()).isEqualTo(purchase.getItemName());
+		assertThat(newPurchase.getAmount()).isEqualTo(purchase.getAmount());
+		assertThat(newPurchase.getLocation()).isEqualTo(purchase.getLocation());
+		assertThat(newPurchase.getDateTime()).isEqualTo(purchase.getDateTime());
+		
+		assertThat(newPurchase).hasNoNullFieldsOrProperties();
+	}
 
 
 }

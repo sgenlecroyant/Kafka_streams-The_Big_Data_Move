@@ -50,6 +50,10 @@ public class Purchase {
 
 		return new PurchaseBuilder();
 	}
+	
+	public static PurchaseBuilder newBuilder(Purchase purchase) {
+		return new PurchaseBuilder(purchase);
+	}
 
 	@Override
 	public String toString() {
