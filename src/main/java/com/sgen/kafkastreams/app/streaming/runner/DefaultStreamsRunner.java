@@ -1,4 +1,4 @@
-package com.sgen.kafkastreams.app.streaming;
+package com.sgen.kafkastreams.app.streaming.runner;
 
 import org.apache.kafka.streams.KafkaStreams;
 

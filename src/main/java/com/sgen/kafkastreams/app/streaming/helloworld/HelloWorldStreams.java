@@ -1,16 +1,16 @@
-package com.sgen.kafkastreams.app;
+package com.sgen.kafkastreams.app.streaming.helloworld;
 
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
 
-import com.sgen.kafkastreams.app.streaming.DefaultStreamsRunner;
-import com.sgen.kafkastreams.app.streaming.StreamsRunner;
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
+import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
+import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
 
 //@SpringBootApplication
-public class HelloWorldKafkaStreams {
+public class HelloWorldStreams {
 
 	public static void main(String[] args) {
 //		SpringApplication.run(KafkaStreamsBigDataMoveApplication.class, args);

@@ -1,4 +1,4 @@
-package com.sgen.kafkastreams.app.streaming;
+package com.sgen.kafkastreams.app.streaming.runner;
 
 public interface StreamsRunner {
 	
