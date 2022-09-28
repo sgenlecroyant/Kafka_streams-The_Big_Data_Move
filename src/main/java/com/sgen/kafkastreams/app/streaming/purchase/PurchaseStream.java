@@ -26,7 +26,7 @@ public class PurchaseStream {
 		StreamsBuilder streamsBuilder = new StreamsBuilder();
 
 		// the source processor which is reading from a Kafka Topic: hello-world
-		KStream<String, String> purchasesSourceStream = streamsBuilder.stream("purchase-transactions");
+		KStream<String, String> purchasesSourceStream = streamsBuilder.stream("purchases");
 		// sending the result back to a specific topic since Kafka Streams is from Kafka
 		// to Kafka
 
