@@ -26,10 +26,12 @@ public class DataProducer {
 		this.kafkaProducer = new KafkaProducer<>(this.getProducerProps());
 
 		String randomFirstName = this.getFakerApi().name().firstName();
-		String greetingMessage = String.format("Hello %s !", randomFirstName);
+		Object greetingMessage = String.format("Hello %s !", randomFirstName);
 
-		ProducerRecord<String, String> producerRecord = new ProducerRecord<String, String>("hello-world",
+		ProducerRecord<String, Object> producerRecord = new ProducerRecord<String, Object>("hello-world",
 				greetingMessage);
+
+		this.kafkaProducer.send(producerRecord);
 
 	}
 
