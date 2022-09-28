@@ -36,5 +36,7 @@ public class PurchaseStream {
 
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();
+		
+		
 	}
 }
