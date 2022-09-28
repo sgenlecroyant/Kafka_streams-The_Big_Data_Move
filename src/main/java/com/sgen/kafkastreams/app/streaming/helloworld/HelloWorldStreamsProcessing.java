@@ -51,12 +51,9 @@ public class HelloWorldStreamsProcessing {
 		streamsRunner.start();
 
 		DataProducer greetingsDataProducer = new DataProducer();
-		int startValue = 0;
-		int limit = 10;
-		while (startValue <= limit) {
-			greetingsDataProducer.sendRandomGreetings();
 
-			TimeUnit.MILLISECONDS.sleep(500);
+		while (true) {
+			greetingsDataProducer.sendRandomGreetings();
 		}
 	}
 }
