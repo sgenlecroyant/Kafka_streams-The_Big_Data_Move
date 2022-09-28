@@ -11,8 +11,10 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 public class CustomGenericLocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
 
 	@Override
-	public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-		LocalDate.parse(DateTimeConstants.dateTimeFormatter.format(value));
+	public void serialize(LocalDateTime value, JsonGenerator jsonGenerator, SerializerProvider serializers)
+			throws IOException {
+//		LocalDate.parse(DateTimeConstants.dateTimeFormatter.format(value));
+		jsonGenerator.writeString(DateTimeConstants.dateTimeFormatter.format(value));
 	}
 
 }

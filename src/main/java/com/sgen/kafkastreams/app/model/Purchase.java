@@ -2,7 +2,11 @@ package com.sgen.kafkastreams.app.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sgen.kafkastreams.app.pattern.PurchaseBuilder;
+import com.sgen.kafkastreams.app.util.CustomGenericLocalDateTimeDeserializer;
+import com.sgen.kafkastreams.app.util.CustomGenericLocalDateTimeSerializer;
 
 public class Purchase {
 
@@ -10,6 +14,8 @@ public class Purchase {
 	private String itemName;
 	private Integer quantity;
 	private double amount;
+	@JsonSerialize(using = CustomGenericLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomGenericLocalDateTimeDeserializer.class)
 	private LocalDateTime dateTime;
 	private String location;
 
@@ -50,7 +56,7 @@ public class Purchase {
 
 		return new PurchaseBuilder();
 	}
-	
+
 	// with data coming from an external source: VERY IMPORTANT
 	public static PurchaseBuilder newBuilder(Purchase purchase) {
 		return new PurchaseBuilder(purchase);
