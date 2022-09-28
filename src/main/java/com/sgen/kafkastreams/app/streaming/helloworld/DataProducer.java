@@ -25,14 +25,13 @@ import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JSR310Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.javafaker.Faker;
+import com.sgen.kafkastreams.app.config.JsonConfig;
 import com.sgen.kafkastreams.app.model.Purchase;
 
 public class DataProducer {
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
-
-	private ObjectMapper objectMapper = new ObjectMapper();
-
+	private ObjectMapper objectMapper;
 	private static final String BOOTSTRAP_SERVERS = "localhost:9092";
 	private static final Class<StringSerializer> DEFAULT_KEY_SERIALIZER = StringSerializer.class;
 	private static final Class<StringSerializer> DEFAULT_VALUE_SERIALIZER = StringSerializer.class;
@@ -62,21 +61,9 @@ public class DataProducer {
 	}
 
 	public void sendRandomPurchase() {
+		this.objectMapper = JsonConfig.getDefaultConfiguredJsonInstance();
 		this.kafkaProducer = new KafkaProducer<>(this.getProducerProps());
-		Faker purchaseApi = this.getFakerApi();
-		Module dataTimeModule = new JavaTimeModule();
-		this.objectMapper.registerModule(dataTimeModule);
-
-		String id = purchaseApi.idNumber().valid();
-		String itemName = purchaseApi.food().dish();
-		int quantity = ThreadLocalRandom.current().nextInt(5, 30);
-		double amount = ThreadLocalRandom.current().nextDouble(300, 800);
-
-		LocalDateTime dateTime = LocalDateTime.now();
-		String location = purchaseApi.country().name();
-
-		Purchase purchase = Purchase.builder().id(ThreadLocalRandom.current().nextInt(1, 1000)).itemName(itemName)
-				.quantity(quantity).amount(amount).dateTime(dateTime).location(location).build();
+		Purchase purchase = this.generatePurchase();
 
 		try {
 			String purchaseAsString = this.objectMapper.writeValueAsString(purchase);
@@ -99,6 +86,20 @@ public class DataProducer {
 
 	public Faker getFakerApi() {
 		return new Faker(Locale.US);
+	}
+
+	public Purchase generatePurchase() {
+		Faker purchaseApi = this.getFakerApi();
+		String id = purchaseApi.idNumber().valid();
+		String itemName = purchaseApi.food().dish();
+		int quantity = ThreadLocalRandom.current().nextInt(5, 30);
+		double amount = ThreadLocalRandom.current().nextDouble(300, 800);
+
+		LocalDateTime dateTime = LocalDateTime.now();
+		String location = purchaseApi.country().name();
+
+		return Purchase.builder().id(ThreadLocalRandom.current().nextInt(1, 1000)).itemName(itemName).quantity(quantity)
+				.amount(amount).dateTime(dateTime).location(location).build();
 	}
 
 }
