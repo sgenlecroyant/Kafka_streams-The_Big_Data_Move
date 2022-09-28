@@ -17,13 +17,13 @@ import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
 import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
 
-//@SpringBootApplication
+@SpringBootApplication
 public class PurchaseStream {
 
 	public static ValueMapper<? super String, ? super String> valueMapper = (v) -> v;
 
 	public static void main(String[] args) {
-//		SpringApplication.run(PurchaseStream.class, args);
+		SpringApplication.run(PurchaseStream.class, args);
 
 		// creating the Global Configuration Settings instance by using the Singleton
 		// Design Pattern

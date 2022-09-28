@@ -11,8 +11,9 @@ import com.fasterxml.jackson.databind.JsonDeserializer;
 public class CustomGenericLocalDateTimeDeserializer extends JsonDeserializer<LocalDateTime> {
 
 	@Override
-	public LocalDateTime deserialize(JsonParser parser, DeserializationContext deserializationContext) throws IOException, JacksonException {
-		return LocalDateTime.parse(deserializationContext.readValue(parser, String.class), DateTimeConstants.dateTimeFormatter);
+	public LocalDateTime deserialize(JsonParser jsonParser, DeserializationContext deserializationContext)
+			throws IOException, JacksonException {
+		return LocalDateTime.parse(jsonParser.readValueAs(String.class), DateTimeConstants.dateTimeFormatter);
 	}
 
 }

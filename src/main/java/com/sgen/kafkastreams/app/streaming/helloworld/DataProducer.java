@@ -83,6 +83,7 @@ public class DataProducer {
 			ProducerRecord<String, Object> purchaseProducerRecord = new ProducerRecord<String, Object>("purchases",
 					purchaseAsString);
 			this.kafkaProducer.send(purchaseProducerRecord);
+			this.logger.info("published: {}", purchaseAsString);
 		} catch (Exception e) {
 			this.logger.error("failed to send purchase record due to: {}", e.getMessage());
 		}
