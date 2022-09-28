@@ -1,6 +1,7 @@
 package com.sgen.kafkastreams.app.streaming.helloworld;
 
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
@@ -19,7 +20,7 @@ public class HelloWorldStreamsProcessing {
 
 	public static ValueMapper<? super String, ? super String> valueMapper = (v) -> v;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 //		SpringApplication.run(KafkaStreamsBigDataMoveApplication.class, args);
 
 		// creating the Global Configuration Settings instance by using the Singleton
@@ -48,5 +49,14 @@ public class HelloWorldStreamsProcessing {
 
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();
+
+		DataProducer greetingsDataProducer = new DataProducer();
+		int startValue = 0;
+		int limit = 10;
+		while (startValue <= limit) {
+			greetingsDataProducer.sendRandomGreetings();
+
+			TimeUnit.MILLISECONDS.sleep(500);
+		}
 	}
 }
