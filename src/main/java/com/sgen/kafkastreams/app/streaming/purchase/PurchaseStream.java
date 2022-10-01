@@ -22,13 +22,12 @@ import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
 import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
 import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
+import com.sgen.kafkastreams.app.thread.PurchaseGeneratorThread;
 
 @SpringBootApplication
 public class PurchaseStream {
 
 	public static ValueMapper<? super String, ? super String> valueMapper = (v) -> v;
-
-	private static Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
 
 	public static void main(String[] args) {
 		SpringApplication.run(PurchaseStream.class, args);
@@ -60,14 +59,16 @@ public class PurchaseStream {
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();
 
-		DataProducer randomPurchaseProducer = new DataProducer();
+		Runnable purchaseRunnable = new PurchaseGeneratorThread();
+		Thread purchaseThread1 = new Thread(purchaseRunnable);
+		Thread purchaseThread2 = new Thread(purchaseRunnable);
+		Thread purchaseThread3 = new Thread(purchaseRunnable);
+		Thread purchaseThread4 = new Thread(purchaseRunnable);
 
-		int countPurchase = 0;
-		while (true) {
-			countPurchase++;
-			randomPurchaseProducer.sendRandomPurchase();
-			LOGGER.info("count: " + countPurchase);
-		}
+		purchaseThread1.start();
+		purchaseThread2.start();
+		purchaseThread3.start();
+		purchaseThread4.start();
 
 	}
 }
