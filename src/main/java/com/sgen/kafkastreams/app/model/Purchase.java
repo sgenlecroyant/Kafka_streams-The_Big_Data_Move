@@ -18,6 +18,10 @@ public class Purchase {
 	@JsonDeserialize(using = CustomGenericLocalDateTimeDeserializer.class)
 	private LocalDateTime dateTime;
 	private String location;
+	
+	public Purchase() {
+		// TODO Auto-generated constructor stub
+	}
 
 	public Purchase(PurchaseBuilder builder) {
 		this.id = builder.getId();
