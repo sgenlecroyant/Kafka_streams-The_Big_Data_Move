@@ -2,6 +2,8 @@ package com.sgen.kafkastreams.app.pattern;
 
 import java.time.LocalDateTime;
 
+import org.apache.logging.log4j.util.Strings;
+
 import com.sgen.kafkastreams.app.model.Purchase;
 
 public class PurchaseBuilder {
@@ -60,6 +62,13 @@ public class PurchaseBuilder {
 
 	public PurchaseBuilder location(String location) {
 		this.location = location;
+		return this;
+	}
+
+	public PurchaseBuilder maskCreditCard() {
+		if (this.creditcardNumber != null) {
+			this.creditcardNumber = this.creditcardNumber.replaceFirst("[0-9]", Strings.repeat("*", 12));
+		}
 		return this;
 	}
 

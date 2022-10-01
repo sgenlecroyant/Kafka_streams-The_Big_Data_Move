@@ -3,6 +3,7 @@ package com.sgen.kafkastreams.app.streaming.purchase;
 import java.io.Serializable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -27,9 +28,8 @@ import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
 import com.sgen.kafkastreams.app.thread.PurchaseGeneratorThread;
 
 @SpringBootApplication
+// // @formatter:off
 public class PurchaseStream {
-
-	public static ValueMapper<? super String, ? super String> valueMapper = (v) -> v;
 
 	public static void main(String[] args) {
 		SpringApplication.run(PurchaseStream.class, args);
@@ -49,8 +49,9 @@ public class PurchaseStream {
 		Serde<Purchase> purchaseSerde = new JsonSerde<Purchase>(Purchase.class);
 
 		// the source processor which is reading from a Kafka Topic: hello-world
-		KStream<String, Purchase> purchasesSourceStream = streamsBuilder.stream("purchases",
-				Consumed.with(keySerde, purchaseSerde));
+		KStream<String, Purchase> purchasesSourceStream = streamsBuilder
+				.stream("purchases", Consumed.with(keySerde, purchaseSerde))
+				.mapValues((purchase) -> Purchase.newBuilder(purchase).maskCreditCard().build());
 		// sending the result back to a specific topic since Kafka Streams is from Kafka
 		// to Kafka
 		purchasesSourceStream.to("purchase-transactions", Produced.with(keySerde, purchaseSerde));
@@ -60,6 +61,20 @@ public class PurchaseStream {
 
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();
+		
+//		 Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
+//
+//		DataProducer randomPurchaseProducer = new DataProducer();
+//
+//		AtomicInteger countPurchase = new AtomicInteger(0);
+
+		
+//		while (true) {
+//			countPurchase.getAndIncrement();
+//			countPurchase.incrementAndGet();
+//			randomPurchaseProducer.sendRandomPurchase();
+//			LOGGER.info("count: " + countPurchase + ", THREAD: " + Thread.currentThread().getName());
+//		}
 
 		int dummyThreads = 5;
 		ExecutorService executorService = Executors.newFixedThreadPool(dummyThreads);

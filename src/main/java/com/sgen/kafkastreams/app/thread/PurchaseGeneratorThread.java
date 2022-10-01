@@ -11,8 +11,8 @@ import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.purchase.PurchaseStream;
 
 public class PurchaseGeneratorThread implements Runnable {
-	private static Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
 	private ExecutorService executors = Executors.newFixedThreadPool(4);
+	private static Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
 
 	DataProducer randomPurchaseProducer = new DataProducer();
 
