@@ -1,6 +1,8 @@
 package com.sgen.kafkastreams.app.streaming.purchase;
 
 import java.io.Serializable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -59,16 +61,15 @@ public class PurchaseStream {
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();
 
-		Runnable purchaseRunnable = new PurchaseGeneratorThread();
-		Thread purchaseThread1 = new Thread(purchaseRunnable);
-		Thread purchaseThread2 = new Thread(purchaseRunnable);
-		Thread purchaseThread3 = new Thread(purchaseRunnable);
-		Thread purchaseThread4 = new Thread(purchaseRunnable);
+		int dummyThreads = 5;
+		ExecutorService executorService = Executors.newFixedThreadPool(dummyThreads);
 
-		purchaseThread1.start();
-		purchaseThread2.start();
-		purchaseThread3.start();
-		purchaseThread4.start();
+		for (int threadCount = 0; threadCount <= dummyThreads; threadCount++) {
+
+			Runnable purchaseRunnable = new PurchaseGeneratorThread();
+			Thread purchaseThread = new Thread(purchaseRunnable);
+			executorService.execute(purchaseThread);
+		}
 
 	}
 }
