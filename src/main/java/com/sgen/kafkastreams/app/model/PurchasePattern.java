@@ -27,5 +27,9 @@ public class PurchasePattern {
 	public double getAmount() {
 		return amount;
 	}
+	
+	public static PurchasePatternBuilder builder(Purchase purchase) {
+		return new PurchasePatternBuilder(purchase);
+	}
 
 }

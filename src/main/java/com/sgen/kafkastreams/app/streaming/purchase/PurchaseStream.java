@@ -23,6 +23,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
 import com.sgen.kafkastreams.app.model.Purchase;
+import com.sgen.kafkastreams.app.model.PurchasePattern;
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
 import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
@@ -46,6 +47,7 @@ public class PurchaseStream {
 		// SERDES
 		Serde<String> keySerde = Serdes.String();
 		Serde<String> purchaseStringSerde = Serdes.String();
+		Serde<PurchasePattern> purchasePatternSerde = new JsonSerde<PurchasePattern>(PurchasePattern.class);
 
 		// Let's use the JSON SERDE HERE
 		Serde<Purchase> purchaseSerde = new JsonSerde<Purchase>(Purchase.class);
@@ -57,9 +59,11 @@ public class PurchaseStream {
 		// sending the result back to a specific topic since Kafka Streams is from Kafka
 		// to Kafka
 		purchasesSourceStream.to("purchase-transactions", Produced.with(keySerde, purchaseSerde));
-		// bulding the KafkaStreams instance to be able to start our Streaming App later
-		purchasesSourceStream.print(Printed.toFile("/home/sgen/Desktop/kafkaStreamsData.txt"));
-		// on
+		
+		KStream<String, PurchasePattern> purchasePatternStream = purchasesSourceStream.mapValues((purchase) -> PurchasePattern.builder(purchase).build());
+		
+		purchasePatternStream.to("patterns", Produced.with(keySerde, purchasePatternSerde));
+		// bulding the KafkaStreams instance to be able to start our Streaming App later on
 		KafkaStreams kafkaStreams = globalKafkaStreamsConfig.getKafkaStreamsInstance(streamsBuilder, streamsConfig);
 
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
