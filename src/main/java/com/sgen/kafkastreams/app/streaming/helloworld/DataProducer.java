@@ -73,12 +73,12 @@ public class DataProducer {
 		String itemName = purchaseApi.food().dish();
 		int quantity = ThreadLocalRandom.current().nextInt(5, 30);
 		double amount = ThreadLocalRandom.current().nextDouble(300, 800);
-
+		String creditcardNumber = purchaseApi.business().creditCardNumber();
 		LocalDateTime dateTime = LocalDateTime.now();
 		String location = purchaseApi.country().name();
 
 		return Purchase.builder().id(ThreadLocalRandom.current().nextInt(1, 1000)).itemName(itemName).quantity(quantity)
-				.amount(amount).dateTime(dateTime).location(location).build();
+				.amount(amount).dateTime(dateTime).location(location).creditcardNumber(creditcardNumber).build();
 	}
 
 }

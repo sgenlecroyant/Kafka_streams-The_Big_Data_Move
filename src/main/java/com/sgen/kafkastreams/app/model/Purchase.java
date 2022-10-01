@@ -18,7 +18,8 @@ public class Purchase {
 	@JsonDeserialize(using = CustomGenericLocalDateTimeDeserializer.class)
 	private LocalDateTime dateTime;
 	private String location;
-	
+	private String creditcardNumber;
+
 	public Purchase() {
 		// TODO Auto-generated constructor stub
 	}
@@ -30,6 +31,7 @@ public class Purchase {
 		this.amount = builder.getAmount();
 		this.dateTime = builder.getDateTime();
 		this.location = builder.getLocation();
+		this.creditcardNumber = builder.getCreditcardNumber();
 	}
 
 	public Integer getId() {
@@ -54,6 +56,10 @@ public class Purchase {
 
 	public String getLocation() {
 		return location;
+	}
+
+	public String getCreditcardNumber() {
+		return creditcardNumber;
 	}
 
 	public static PurchaseBuilder builder() {

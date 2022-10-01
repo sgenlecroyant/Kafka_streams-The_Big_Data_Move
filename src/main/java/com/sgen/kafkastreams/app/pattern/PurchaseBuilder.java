@@ -12,8 +12,7 @@ public class PurchaseBuilder {
 	private double amount;
 	private LocalDateTime dateTime;
 	private String location;
-
-	private Purchase newPurchase;
+	private String creditcardNumber;
 
 	public PurchaseBuilder() {
 		// TODO Auto-generated constructor stub
@@ -26,6 +25,7 @@ public class PurchaseBuilder {
 		this.dateTime = purchase.getDateTime();
 		this.location = purchase.getLocation();
 		this.quantity = purchase.getQuantity();
+		this.creditcardNumber = purchase.getCreditcardNumber();
 	}
 
 	public PurchaseBuilder id(Integer id) {
@@ -45,6 +45,11 @@ public class PurchaseBuilder {
 
 	public PurchaseBuilder amount(double amount) {
 		this.amount = amount;
+		return this;
+	}
+
+	public PurchaseBuilder creditcardNumber(String creditcardNummber) {
+		this.creditcardNumber = creditcardNummber;
 		return this;
 	}
 
@@ -80,6 +85,10 @@ public class PurchaseBuilder {
 
 	public String getLocation() {
 		return location;
+	}
+
+	public String getCreditcardNumber() {
+		return creditcardNumber;
 	}
 
 	public Purchase build() {

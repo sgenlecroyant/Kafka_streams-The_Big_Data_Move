@@ -7,9 +7,12 @@ import java.time.LocalDateTime;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import com.github.javafaker.Faker;
 import com.sgen.kafkastreams.app.model.Purchase;
 
 class PurchaseBuilderTest {
+
+	private Faker faker = new Faker();
 
 	@Test
 	@DisplayName("SUCCESS TEST: PURCHASE BUILDER PATTERN")
@@ -21,6 +24,7 @@ class PurchaseBuilderTest {
 		String location = "NewYork City";
 		int quantity = 23;
 		int amount = 1000;
+		String creditcardNumber = faker.business().creditCardNumber();
 		Purchase purchase = 
 				Purchase
 				.builder()
@@ -30,6 +34,7 @@ class PurchaseBuilderTest {
 				.dateTime(LocalDateTime.now())
 				.location(location)
 				.quantity(quantity)
+				.creditcardNumber(creditcardNumber)
 				.build();
 		// When
 //		assertThat(purchase.getLocation()).isEqualTo(location);
@@ -47,6 +52,7 @@ class PurchaseBuilderTest {
 		String location = "NewYork City";
 		int quantity = 23;
 		int amount = 1000;
+		String creditcardNumber = faker.business().creditCardNumber();
 		Purchase purchase = 
 				Purchase
 				.builder()
@@ -55,6 +61,7 @@ class PurchaseBuilderTest {
 				.dateTime(LocalDateTime.now())
 				.location(location)
 				.quantity(quantity)
+				.creditcardNumber(creditcardNumber)
 				.build();
 		// When
 //		assertThat(purchase.getLocation()).isEqualTo(location);
@@ -65,7 +72,7 @@ class PurchaseBuilderTest {
 	@Test
 	@DisplayName("NEW BUILDER: WITH EXTERNAL SOURCE")
 	public void testNewBuilderMethod() {
-		
+		String creditcardNumber = faker.business().creditCardNumber();
 		Purchase purchase = 
 				Purchase.builder()
 				.id(1000)
@@ -74,6 +81,7 @@ class PurchaseBuilderTest {
 				.quantity(34)
 				.dateTime(LocalDateTime.now())
 				.location("location")
+				.creditcardNumber(creditcardNumber)
 				.build();
 		Purchase newPurchase = 
 				Purchase.newBuilder(purchase)
