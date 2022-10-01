@@ -5,6 +5,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.kafka.clients.producer.MockProducer;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -12,6 +13,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.ValueMapper;
 import org.slf4j.Logger;
@@ -56,11 +58,13 @@ public class PurchaseStream {
 		// to Kafka
 		purchasesSourceStream.to("purchase-transactions", Produced.with(keySerde, purchaseSerde));
 		// bulding the KafkaStreams instance to be able to start our Streaming App later
+		purchasesSourceStream.print(Printed.toFile("/home/sgen/Desktop/kafkaStreamsData.txt"));
 		// on
 		KafkaStreams kafkaStreams = globalKafkaStreamsConfig.getKafkaStreamsInstance(streamsBuilder, streamsConfig);
 
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();
+		
 		
 //		 Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
 //
