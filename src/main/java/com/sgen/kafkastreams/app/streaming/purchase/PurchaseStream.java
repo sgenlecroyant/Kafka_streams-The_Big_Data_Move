@@ -13,6 +13,7 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.Predicate;
 import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.ValueMapper;
@@ -20,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.kafka.support.KafkaStreamBrancher;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
 import com.sgen.kafkastreams.app.model.Purchase;
@@ -33,6 +35,23 @@ import com.sgen.kafkastreams.app.thread.PurchaseGeneratorThread;
 @SpringBootApplication
 // // @formatter:off
 public class PurchaseStream {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
+	
+	private static Predicate<String, Purchase> isDepartmentCoffee = 
+			(key, purchase) -> {
+				if(purchase.getDepartment() != null) {
+					return purchase.getDepartment().equalsIgnoreCase("coffee");
+				}
+				return false;
+			};
+	private static Predicate<String, Purchase> isDepartmentElectronics = 
+					(key, purchase) -> {
+						if(purchase.getDepartment() != null) {
+							return purchase.getDepartment().equalsIgnoreCase("electronics");
+						}
+						return false;
+					};
 
 	public static void main(String[] args) {
 		SpringApplication.run(PurchaseStream.class, args);
@@ -46,7 +65,6 @@ public class PurchaseStream {
 
 		// SERDES
 		Serde<String> keySerde = Serdes.String();
-		Serde<String> purchaseStringSerde = Serdes.String();
 		Serde<PurchasePattern> purchasePatternSerde = new JsonSerde<PurchasePattern>(PurchasePattern.class);
 
 		// Let's use the JSON SERDE HERE
@@ -58,6 +76,22 @@ public class PurchaseStream {
 				.mapValues((purchase) -> Purchase.newBuilder(purchase).maskCreditCard().build());
 		// sending the result back to a specific topic since Kafka Streams is from Kafka
 		// to Kafka
+		
+		//branching into coffee and electronics
+		KafkaStreamBrancher<String, Purchase> purchaseStreamBrancher = 
+				new KafkaStreamBrancher<>();
+		
+		purchaseStreamBrancher
+				.branch(isDepartmentCoffee, (coffeeStream) -> {
+					coffeeStream.to("coffee", Produced.with(keySerde, purchaseSerde));
+				})
+				.branch(isDepartmentElectronics, (electronicStream) -> electronicStream.to("electronics", Produced.with(keySerde, purchaseSerde)))
+				.defaultBranch((stream) -> {
+					LOGGER.warn("UNEVALUATED PURCHASE: => ", stream.toString());
+				})
+				.onTopOf(purchasesSourceStream);
+		
+		
 		purchasesSourceStream.to("purchase-transactions", Produced.with(keySerde, purchaseSerde));
 		
 		KStream<String, PurchasePattern> purchasePatternStream = purchasesSourceStream.mapValues((purchase) -> PurchasePattern.builder(purchase).build());
