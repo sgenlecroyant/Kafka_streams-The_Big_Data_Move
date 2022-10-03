@@ -9,6 +9,7 @@ import com.sgen.kafkastreams.app.model.Purchase;
 public class PurchaseBuilder {
 
 	private Integer id;
+	private String customerId;
 	private String itemName;
 	private Integer quantity;
 	private double amount;
@@ -23,6 +24,7 @@ public class PurchaseBuilder {
 
 	public PurchaseBuilder(Purchase purchase) {
 		this.id = purchase.getId();
+		this.customerId = purchase.getCustomerId();
 		this.itemName = purchase.getItemName();
 		this.amount = purchase.getAmount();
 		this.dateTime = purchase.getDateTime();
@@ -34,6 +36,11 @@ public class PurchaseBuilder {
 
 	public PurchaseBuilder id(Integer id) {
 		this.id = id;
+		return this;
+	}
+
+	public PurchaseBuilder customerId(String customerId) {
+		this.customerId = customerId;
 		return this;
 	}
 
@@ -105,6 +112,10 @@ public class PurchaseBuilder {
 
 	public String getCreditcardNumber() {
 		return creditcardNumber;
+	}
+
+	public String getCustomerId() {
+		return customerId;
 	}
 
 	public String getDepartment() {

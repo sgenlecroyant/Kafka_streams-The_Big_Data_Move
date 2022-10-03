@@ -11,6 +11,7 @@ import com.sgen.kafkastreams.app.util.CustomGenericLocalDateTimeSerializer;
 public class Purchase {
 
 	private Integer id;
+	private String customerId;
 	private String itemName;
 	private Integer quantity;
 	private double amount;
@@ -27,6 +28,7 @@ public class Purchase {
 
 	public Purchase(PurchaseBuilder builder) {
 		this.id = builder.getId();
+		this.customerId = builder.getCustomerId();
 		this.itemName = builder.getItemName();
 		this.quantity = builder.getQuantity();
 		this.amount = builder.getAmount();
@@ -51,7 +53,7 @@ public class Purchase {
 	public double getAmount() {
 		return amount;
 	}
-	
+
 	public String getDepartment() {
 		return department;
 	}
@@ -66,6 +68,10 @@ public class Purchase {
 
 	public String getCreditcardNumber() {
 		return creditcardNumber;
+	}
+
+	public String getCustomerId() {
+		return customerId;
 	}
 
 	public static PurchaseBuilder builder() {

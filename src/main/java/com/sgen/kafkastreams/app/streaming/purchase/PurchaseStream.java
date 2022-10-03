@@ -38,7 +38,7 @@ import com.sgen.kafkastreams.app.thread.PurchaseGeneratorThread;
 public class PurchaseStream {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
-	
+
 	private static Predicate<String, Purchase> isDepartmentCoffee = 
 			(key, purchase) -> {
 				if(purchase.getDepartment() != null) {

@@ -13,6 +13,7 @@ import com.sgen.kafkastreams.app.model.Purchase;
 class PurchaseBuilderTest {
 
 	private Faker faker = new Faker();
+	private String customerId = "customer-id";
 
 	@Test
 	@DisplayName("SUCCESS TEST: PURCHASE BUILDER PATTERN")
@@ -30,6 +31,7 @@ class PurchaseBuilderTest {
 				Purchase
 				.builder()
 				.id(1)
+				.customerId(department)
 				.itemName(itemName)
 				.amount(amount)
 				.dateTime(LocalDateTime.now())
@@ -61,6 +63,7 @@ class PurchaseBuilderTest {
 				Purchase
 				.builder()
 				.itemName(itemName)
+				.customerId(customerId)
 				.amount(amount)
 				.dateTime(LocalDateTime.now())
 				.location(location)
@@ -83,6 +86,7 @@ class PurchaseBuilderTest {
 		Purchase purchase = 
 				Purchase.builder()
 				.id(1000)
+				.customerId(department)
 				.itemName("ItemName")
 				.amount(1200)
 				.quantity(34)
