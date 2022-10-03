@@ -30,6 +30,7 @@ import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
 import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
 import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
+import com.sgen.kafkastreams.app.streaming.util.StreamsUtil;
 import com.sgen.kafkastreams.app.thread.PurchaseGeneratorThread;
 
 @SpringBootApplication
@@ -76,7 +77,11 @@ public class PurchaseStream {
 				.mapValues((purchase) -> Purchase.newBuilder(purchase).maskCreditCard().build());
 		// sending the result back to a specific topic since Kafka Streams is from Kafka
 		// to Kafka
-		
+		Produced<String, Purchase> producedPurchase = Produced.with(keySerde, purchaseSerde);
+		purchasesSourceStream.filter(StreamsUtil.isCheap())
+								.to("inexpensive-purchases", producedPurchase);
+		purchasesSourceStream.filterNot(StreamsUtil.isCheap())
+								.to("expensive-purchases", producedPurchase);
 		//branching into coffee and electronics
 		KafkaStreamBrancher<String, Purchase> purchaseStreamBrancher = 
 				new KafkaStreamBrancher<>();
