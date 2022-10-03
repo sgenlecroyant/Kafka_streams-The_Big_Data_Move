@@ -6,9 +6,17 @@ public class RewardAccumulator {
 
 	private String customerId;
 	private double purchaseTotalAmount;
-	private Integer currentRewardPoints;
-	private Integer totalRewardPoints;
+	private int currentRewardPoints;
+	private int totalRewardPoints;
 	private int daysFromLastPurchase;
+
+	public RewardAccumulator(RewardAccumulatorBuilder builder) {
+		this.customerId = builder.getCustomerId();
+		this.purchaseTotalAmount = builder.getPurchaseTotalAmount();
+		this.currentRewardPoints = builder.getCurrentRewardPoints();
+		this.totalRewardPoints = builder.getTotalRewardPoints();
+		this.daysFromLastPurchase = builder.getDaysFromLasyPurchase();
+	}
 
 	public String getCustomerId() {
 		return customerId;
@@ -30,13 +38,12 @@ public class RewardAccumulator {
 		return daysFromLastPurchase;
 	}
 
-	public void addRewardPoints(Integer previousTotalRewardPoints) {
+	public void addRewardPoints(int previousTotalRewardPoints) {
 		this.totalRewardPoints += previousTotalRewardPoints;
 	}
-	
-	public RewardAccumulatorBuilder builder(Purchase purchase) {
+
+	public static RewardAccumulatorBuilder builder(Purchase purchase) {
 		return new RewardAccumulatorBuilder(purchase);
 	}
 
-	
 }
