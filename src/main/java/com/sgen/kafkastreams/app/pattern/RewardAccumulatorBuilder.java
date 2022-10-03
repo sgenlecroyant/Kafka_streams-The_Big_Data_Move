@@ -3,14 +3,38 @@ package com.sgen.kafkastreams.app.pattern;
 import com.sgen.kafkastreams.app.model.Purchase;
 
 public class RewardAccumulatorBuilder {
-	
+
 	private String customerId;
 	private double purchaseTotalAmount;
 	private Integer totalRewardPoints;
-	private int daysFromLastPurchase;
-	
+	private int currentRewardPoints;
+
 	public RewardAccumulatorBuilder(Purchase purchase) {
-//		this.customerId = purchase.getc
+		this.customerId = purchase.getCustomerId();
+		this.purchaseTotalAmount = purchase.getAmount() * purchase.getQuantity();
+		this.currentRewardPoints = (int) this.purchaseTotalAmount;
+	}
+
+	public String getCustomerId() {
+		return customerId;
+	}
+
+	public double getPurchaseTotalAmount() {
+		return purchaseTotalAmount;
+	}
+
+	public Integer getTotalRewardPoints() {
+		return totalRewardPoints;
+	}
+
+	public int getCurrentRewardPoints() {
+		return currentRewardPoints;
+	}
+
+	@Override
+	public String toString() {
+		return "RewardAccumulatorBuilder [customerId=" + customerId + ", purchaseTotalAmount=" + purchaseTotalAmount
+				+ ", totalRewardPoints=" + totalRewardPoints + ", currentRewardPoints=" + currentRewardPoints + "]";
 	}
 
 }

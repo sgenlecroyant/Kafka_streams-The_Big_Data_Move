@@ -1,5 +1,7 @@
 package com.sgen.kafkastreams.app.model;
 
+import com.sgen.kafkastreams.app.pattern.RewardAccumulatorBuilder;
+
 public class RewardAccumulator {
 
 	private String customerId;
@@ -30,6 +32,10 @@ public class RewardAccumulator {
 
 	public void addRewardPoints(Integer previousTotalRewardPoints) {
 		this.totalRewardPoints += previousTotalRewardPoints;
+	}
+	
+	public RewardAccumulatorBuilder builder(Purchase purchase) {
+		return new RewardAccumulatorBuilder(purchase);
 	}
 
 	
