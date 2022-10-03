@@ -25,6 +25,7 @@ class PurchaseBuilderTest {
 		int quantity = 23;
 		int amount = 1000;
 		String creditcardNumber = faker.business().creditCardNumber();
+		String department = "department";
 		Purchase purchase = 
 				Purchase
 				.builder()
@@ -35,6 +36,7 @@ class PurchaseBuilderTest {
 				.location(location)
 				.quantity(quantity)
 				.creditcardNumber(creditcardNumber)
+				.department(department)
 				.build();
 		// When
 //		assertThat(purchase.getLocation()).isEqualTo(location);
@@ -52,6 +54,8 @@ class PurchaseBuilderTest {
 		String location = "NewYork City";
 		int quantity = 23;
 		int amount = 1000;
+		String id = "id sskskks";
+		String department = "department";
 		String creditcardNumber = faker.business().creditCardNumber();
 		Purchase purchase = 
 				Purchase
@@ -61,6 +65,8 @@ class PurchaseBuilderTest {
 				.dateTime(LocalDateTime.now())
 				.location(location)
 				.quantity(quantity)
+				.department(department)
+				.id(12)
 				.creditcardNumber(creditcardNumber)
 				.build();
 		// When
@@ -73,6 +79,7 @@ class PurchaseBuilderTest {
 	@DisplayName("NEW BUILDER: WITH EXTERNAL SOURCE")
 	public void testNewBuilderMethod() {
 		String creditcardNumber = faker.business().creditCardNumber();
+		String department = "department";
 		Purchase purchase = 
 				Purchase.builder()
 				.id(1000)
@@ -82,6 +89,7 @@ class PurchaseBuilderTest {
 				.dateTime(LocalDateTime.now())
 				.location("location")
 				.creditcardNumber(creditcardNumber)
+				.department(department)
 				.build();
 		Purchase newPurchase = 
 				Purchase.newBuilder(purchase)

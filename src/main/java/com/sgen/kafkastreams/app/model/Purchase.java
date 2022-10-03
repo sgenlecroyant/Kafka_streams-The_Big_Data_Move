@@ -19,6 +19,7 @@ public class Purchase {
 	private LocalDateTime dateTime;
 	private String location;
 	private String creditcardNumber;
+	private String department;
 
 	public Purchase() {
 		// TODO Auto-generated constructor stub
@@ -32,6 +33,7 @@ public class Purchase {
 		this.dateTime = builder.getDateTime();
 		this.location = builder.getLocation();
 		this.creditcardNumber = builder.getCreditcardNumber();
+		this.department = builder.getDepartment();
 	}
 
 	public Integer getId() {
@@ -48,6 +50,10 @@ public class Purchase {
 
 	public double getAmount() {
 		return amount;
+	}
+	
+	public String getDepartment() {
+		return department;
 	}
 
 	public LocalDateTime getDateTime() {
@@ -75,7 +81,8 @@ public class Purchase {
 	@Override
 	public String toString() {
 		return "Purchase [id=" + id + ", itemName=" + itemName + ", quantity=" + quantity + ", amount=" + amount
-				+ ", dateTime=" + dateTime + "]";
+				+ ", dateTime=" + dateTime + ", location=" + location + ", creditcardNumber=" + creditcardNumber
+				+ ", department=" + department + "]";
 	}
 
 }

@@ -2,6 +2,7 @@ package com.sgen.kafkastreams.app.streaming.helloworld;
 
 import java.time.LocalDateTime;
 import java.util.Locale;
+import java.util.Random;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -67,6 +68,14 @@ public class DataProducer {
 		return new Faker(Locale.US);
 	}
 
+	public String generateRandomDepartment() {
+		String[] departments = { "coffee", "electronics" };
+		Random random = new Random();
+		int randomPosition = random.nextInt(0, 2);
+		return departments[randomPosition];
+
+	}
+
 	public Purchase generatePurchase() {
 		Faker purchaseApi = this.getFakerApi();
 		String id = purchaseApi.idNumber().valid();
@@ -76,9 +85,11 @@ public class DataProducer {
 		String creditcardNumber = purchaseApi.business().creditCardNumber();
 		LocalDateTime dateTime = LocalDateTime.now();
 		String location = purchaseApi.country().name();
+		String department = this.generateRandomDepartment();
 
 		return Purchase.builder().id(ThreadLocalRandom.current().nextInt(1, 1000)).itemName(itemName).quantity(quantity)
-				.amount(amount).dateTime(dateTime).location(location).creditcardNumber(creditcardNumber).build();
+				.amount(amount).dateTime(dateTime).location(location).creditcardNumber(creditcardNumber)
+				.department(department).build();
 	}
 
 }
