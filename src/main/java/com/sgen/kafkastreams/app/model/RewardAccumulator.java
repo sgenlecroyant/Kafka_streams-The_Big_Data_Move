@@ -32,4 +32,5 @@ public class RewardAccumulator {
 		this.totalRewardPoints += previousTotalRewardPoints;
 	}
 
+	
 }
