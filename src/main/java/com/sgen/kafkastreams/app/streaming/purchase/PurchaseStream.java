@@ -26,10 +26,12 @@ import org.springframework.kafka.support.serializer.JsonSerde;
 
 import com.sgen.kafkastreams.app.model.Purchase;
 import com.sgen.kafkastreams.app.model.PurchasePattern;
+import com.sgen.kafkastreams.app.model.RewardAccumulator;
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
 import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
 import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
+import com.sgen.kafkastreams.app.streaming.transformer.PurchaseTransformer;
 import com.sgen.kafkastreams.app.streaming.util.StreamsUtil;
 import com.sgen.kafkastreams.app.thread.PurchaseGeneratorThread;
 
@@ -98,6 +100,11 @@ public class PurchaseStream {
 		
 		
 		purchasesSourceStream.to("purchase-transactions", Produced.with(keySerde, purchaseSerde));
+		// THE STORE NAME
+		String storeName = "rewardPointsStore";
+		KStream<String, RewardAccumulator> rewardAccumulatorStream = purchasesSourceStream.transformValues(() -> new PurchaseTransformer(storeName), storeName);
+		
+		rewardAccumulatorStream.to("rewards", Produced.with(keySerde, new JsonSerde<>(RewardAccumulator.class)));
 		
 		KStream<String, PurchasePattern> purchasePatternStream = purchasesSourceStream.mapValues((purchase) -> PurchasePattern.builder(purchase).build());
 		

@@ -1,7 +1,5 @@
 package com.sgen.kafkastreams.app.pattern;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 import java.time.LocalDateTime;
 
 import org.assertj.core.api.Assertions;
