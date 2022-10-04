@@ -82,7 +82,8 @@ public class DataProducer {
 		String itemName = purchaseApi.food().dish();
 		int quantity = ThreadLocalRandom.current().nextInt(5, 30);
 		double amount = ThreadLocalRandom.current().nextDouble(300, 800);
-		String creditcardNumber = purchaseApi.business().creditCardNumber();
+//		String creditcardNumber = purchaseApi.business().creditCardNumber();
+		String creditcardNumber = this.generateCreditCardNumber();
 		LocalDateTime dateTime = LocalDateTime.now();
 		String location = purchaseApi.country().name();
 		String department = this.generateRandomDepartment();
@@ -90,6 +91,13 @@ public class DataProducer {
 		return Purchase.builder().id(ThreadLocalRandom.current().nextInt(1, 1000)).itemName(itemName).quantity(quantity)
 				.amount(amount).dateTime(dateTime).location(location).creditcardNumber(creditcardNumber)
 				.department(department).build();
+	}
+
+	private String generateCreditCardNumber() {
+		String[] creditcardNumbers = { "card-12-23-34", "card-56-67-78" };
+		Random random = new Random();
+		int creditcardNumberPosition = random.nextInt(0, 2);
+		return creditcardNumbers[creditcardNumberPosition];
 	}
 
 }
