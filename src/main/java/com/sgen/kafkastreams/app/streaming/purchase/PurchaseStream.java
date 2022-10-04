@@ -1,11 +1,11 @@
 package com.sgen.kafkastreams.app.streaming.purchase;
 
-import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.atomic.AtomicInteger;
 
-import org.apache.kafka.clients.producer.MockProducer;
+import org.apache.kafka.clients.admin.Config;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -14,9 +14,11 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.Predicate;
-import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
-import org.apache.kafka.streams.kstream.ValueMapper;
+import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier;
+import org.apache.kafka.streams.state.KeyValueStore;
+import org.apache.kafka.streams.state.StoreBuilder;
+import org.apache.kafka.streams.state.Stores;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -28,7 +30,6 @@ import com.sgen.kafkastreams.app.model.Purchase;
 import com.sgen.kafkastreams.app.model.PurchasePattern;
 import com.sgen.kafkastreams.app.model.RewardAccumulator;
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
-import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
 import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
 import com.sgen.kafkastreams.app.streaming.transformer.PurchaseTransformer;
@@ -65,6 +66,23 @@ public class PurchaseStream {
 		StreamsConfig streamsConfig = globalKafkaStreamsConfig.applyDefaultConfigSettings();
 
 		StreamsBuilder streamsBuilder = new StreamsBuilder();
+		
+		String storeName = "rewardPointsStore";
+		KeyValueBytesStoreSupplier keyValueBytesStoreSupplier = 
+				Stores.inMemoryKeyValueStore(storeName);
+		
+		StoreBuilder<KeyValueStore<String, Integer>> storeBuilder = 
+				Stores.keyValueStoreBuilder(keyValueBytesStoreSupplier, Serdes.String(), Serdes.Integer());
+
+		Map<String, String> loggingConfigs = 
+				new HashMap<>();
+		
+		loggingConfigs.put("retention.ms", "172800000");
+		loggingConfigs.put("cleanup.policy", "delete,compact");
+		loggingConfigs.put("retention.bytes", "10000000000");
+		
+		storeBuilder.withLoggingEnabled(loggingConfigs);
+		streamsBuilder.addStateStore(storeBuilder);
 
 		// SERDES
 		Serde<String> keySerde = Serdes.String();
@@ -101,7 +119,6 @@ public class PurchaseStream {
 		
 		purchasesSourceStream.to("purchase-transactions", Produced.with(keySerde, purchaseSerde));
 		// THE STORE NAME
-		String storeName = "rewardPointsStore";
 		KStream<String, RewardAccumulator> rewardAccumulatorStream = purchasesSourceStream.transformValues(() -> new PurchaseTransformer(storeName), storeName);
 		
 		rewardAccumulatorStream.to("rewards", Produced.with(keySerde, new JsonSerde<>(RewardAccumulator.class)));

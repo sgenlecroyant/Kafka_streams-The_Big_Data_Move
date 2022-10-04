@@ -56,7 +56,7 @@ public class DataProducer {
 
 		try {
 			ProducerRecord<String, Purchase> purchaseProducerRecord = new ProducerRecord<String, Purchase>("purchases",
-					purchase);
+					purchase.getCustomerId(), purchase);
 			this.purchaseKafkaProducer.send(purchaseProducerRecord);
 			this.logger.info("published: {}", purchase);
 		} catch (Exception e) {
@@ -90,7 +90,7 @@ public class DataProducer {
 
 		return Purchase.builder().id(ThreadLocalRandom.current().nextInt(1, 1000)).itemName(itemName).quantity(quantity)
 				.amount(amount).dateTime(dateTime).location(location).creditcardNumber(creditcardNumber)
-				.department(department).build();
+				.department(department).customerId(creditcardNumber).build();
 	}
 
 	private String generateCreditCardNumber() {

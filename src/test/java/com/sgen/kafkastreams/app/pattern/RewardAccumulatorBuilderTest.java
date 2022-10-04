@@ -20,18 +20,21 @@ class RewardAccumulatorBuilderTest {
 		String creditcardNumber = faker.business().creditCardNumber();
 		String department = "department";
 		String customerId = "customer-id";
-		Purchase purchase = Purchase.builder().id(1000).customerId(customerId).itemName("ItemName").amount(1200)
-				.quantity(34).dateTime(LocalDateTime.now()).location("location").creditcardNumber(creditcardNumber)
+		Purchase purchase = Purchase.builder().id(1000).customerId(customerId).itemName("ItemName").amount(1000)
+				.quantity(3).dateTime(LocalDateTime.now()).location("location").creditcardNumber(creditcardNumber)
 				.department(department).build();
 
-		this.rewardAccumulator = RewardAccumulator.builder(purchase)
-				.build();
+		this.rewardAccumulator = RewardAccumulator.builder(purchase).build();
 
 	}
 
 	@Test
 	void test() {
-		Assertions.assertThat(this.rewardAccumulator).hasNoNullFieldsOrPropertiesExcept("daysFromLastPurchase");
+//		Assertions.assertThat(this.rewardAccumulator).hasNoNullFieldsOrPropertiesExcept("daysFromLastPurchase");
+		Assertions.assertThat(this.rewardAccumulator).hasNoNullFieldsOrProperties();
+		this.rewardAccumulator.addRewardPoints(2000);
+
+		Assertions.assertThat(rewardAccumulator.getTotalRewardPoints()).isEqualByComparingTo(3000 + 2000);
 
 	}
 

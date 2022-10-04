@@ -31,7 +31,7 @@ class PurchaseBuilderTest {
 				Purchase
 				.builder()
 				.id(1)
-				.customerId(department)
+				.customerId(customerId)
 				.itemName(itemName)
 				.amount(amount)
 				.dateTime(LocalDateTime.now())
@@ -86,7 +86,7 @@ class PurchaseBuilderTest {
 		Purchase purchase = 
 				Purchase.builder()
 				.id(1000)
-				.customerId(department)
+				.customerId(customerId)
 				.itemName("ItemName")
 				.amount(1200)
 				.quantity(34)

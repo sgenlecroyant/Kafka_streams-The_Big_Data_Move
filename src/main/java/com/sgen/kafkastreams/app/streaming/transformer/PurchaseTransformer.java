@@ -40,6 +40,7 @@ public class PurchaseTransformer implements ValueTransformer<Purchase, RewardAcc
 		RewardAccumulator rewardAccumulator = RewardAccumulator.builder(purchase).build();
 		String customerId = purchase.getCustomerId();
 		Integer accumulatedSoFar = this.keyValueStateStore.get(customerId);
+
 		if (accumulatedSoFar != null) {
 			rewardAccumulator.addRewardPoints(accumulatedSoFar);
 		}
