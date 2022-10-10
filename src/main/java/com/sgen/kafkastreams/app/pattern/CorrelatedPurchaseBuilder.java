@@ -3,6 +3,8 @@ package com.sgen.kafkastreams.app.pattern;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.sgen.kafkastreams.app.model.CorrelatedPurchase;
+
 public class CorrelatedPurchaseBuilder {
 
 	private String customerId;
@@ -58,6 +60,10 @@ public class CorrelatedPurchaseBuilder {
 	public CorrelatedPurchaseBuilder secondPurchaseTime(LocalDateTime secondPurchaseTime) {
 		this.secondPurchaseTime = secondPurchaseTime;
 		return this;
+	}
+	
+	public CorrelatedPurchase build() {
+		return new CorrelatedPurchase(this);
 	}
 
 }
