@@ -3,6 +3,8 @@ package com.sgen.kafkastreams.app.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.sgen.kafkastreams.app.pattern.CorrelatedPurchaseBuilder;
+
 public class CorrelatedPurchase {
 
 	private String customerId;
@@ -11,7 +13,12 @@ public class CorrelatedPurchase {
 	private LocalDateTime firstPurchaseTime;
 	private LocalDateTime secondPurchaseTime;
 
-	public CorrelatedPurchase() {
+	public CorrelatedPurchase(CorrelatedPurchaseBuilder builder) {
+		this.customerId = builder.getCustomerId();
+		this.itemsPurchased = builder.getItemsPurchased();
+		this.totalAmount = builder.getTotalAmount();
+		this.firstPurchaseTime = builder.getFirstPurchaseTime();
+		this.secondPurchaseTime = builder.getSecondPurchaseTime();
 	}
 
 	public String getCustomerId() {
@@ -32,6 +39,10 @@ public class CorrelatedPurchase {
 
 	public LocalDateTime getSecondPurchaseTime() {
 		return secondPurchaseTime;
+	}
+	
+	public static CorrelatedPurchaseBuilder newBuilder() {
+		return new CorrelatedPurchaseBuilder();
 	}
 
 	@Override
