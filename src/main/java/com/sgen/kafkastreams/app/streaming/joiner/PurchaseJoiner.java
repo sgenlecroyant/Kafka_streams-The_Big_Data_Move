@@ -42,20 +42,20 @@ public class PurchaseJoiner implements ValueJoiner<Purchase, Purchase, Correlate
 		this.itemsPurchased = new ArrayList<>();
 		
 		if(firstItemPurchased != null) {
-			itemsPurchased.add(firstItemPurchased+ ":" +this.firstPrice);
+			itemsPurchased.add(this.getFirstItemPurchased()+ ":" +this.getFirstPrice());
 		}
 		
 		if(secondItemPurchased != null) {
-			itemsPurchased.add(secondItemPurchased+ ":" +this.secondPrice);
+			itemsPurchased.add(this.getSecondItemPurchased()+ ":" +this.getSecondPrice());
 		}
 		this.totalAmount = firstPrice + secondPrice;
 		
 		CorrelatedPurchase correlatedPurchase = 
-				builder.customerId(customerId)
+				builder.customerId(this.getCustomerId())
 						.itemsPurchased(this.getItemsPurchased())
-						.firstPurchaseTime(firstPurchaseTime)
-						.secondPurchaseTime(secondPurchaseTime)
-						.totalAmount(totalAmount)
+						.firstPurchaseTime(this.getFirstPurchaseTime())
+						.secondPurchaseTime(this.getSecondPurchaseTime())
+						.totalAmount(this.getTotalAmount())
 						.build();
 		
 		return correlatedPurchase;
@@ -64,5 +64,39 @@ public class PurchaseJoiner implements ValueJoiner<Purchase, Purchase, Correlate
 	public List<String> getItemsPurchased() {
 		return itemsPurchased;
 	}
+
+	public String getCustomerId() {
+		return customerId;
+	}
+
+	public double getTotalAmount() {
+		return totalAmount;
+	}
+
+	public double getFirstPrice() {
+		return firstPrice;
+	}
+
+	public double getSecondPrice() {
+		return secondPrice;
+	}
+
+	public String getFirstItemPurchased() {
+		return firstItemPurchased;
+	}
+
+	public String getSecondItemPurchased() {
+		return secondItemPurchased;
+	}
+
+	public LocalDateTime getFirstPurchaseTime() {
+		return firstPurchaseTime;
+	}
+
+	public LocalDateTime getSecondPurchaseTime() {
+		return secondPurchaseTime;
+	}
+	
+	
 
 }
