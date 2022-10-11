@@ -23,6 +23,7 @@ import org.apache.kafka.streams.kstream.Predicate;
 import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.StreamJoined;
+import org.apache.kafka.streams.processor.TimestampExtractor;
 import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
@@ -42,6 +43,7 @@ import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
 import com.sgen.kafkastreams.app.streaming.joiner.PurchaseJoiner;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
 import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
+import com.sgen.kafkastreams.app.streaming.timestampextractor.PurchaseTimestampExtractor;
 import com.sgen.kafkastreams.app.streaming.transformer.PurchaseTransformer;
 import com.sgen.kafkastreams.app.streaming.util.StreamsUtil;
 import com.sgen.kafkastreams.app.thread.PurchaseGeneratorThread;
@@ -102,9 +104,11 @@ public class PurchaseStream {
 		Serde<Purchase> purchaseSerde = new JsonSerde<Purchase>(Purchase.class);
 		Serde<CorrelatedPurchase> correlatedPurchaseSerde = new JsonSerde<>(CorrelatedPurchase.class);
 
+		// Our PurchaseTimestampExtractor
+		TimestampExtractor purchaseTimestampExtractor = new PurchaseTimestampExtractor();
 		// the source processor which is reading from a Kafka Topic: hello-world
 		KStream<String, Purchase> purchasesSourceStream = streamsBuilder
-				.stream("purchases", Consumed.with(keySerde, purchaseSerde))
+				.stream("purchases", Consumed.with(keySerde, purchaseSerde).withTimestampExtractor(purchaseTimestampExtractor))
 				.mapValues((purchase) -> Purchase.newBuilder(purchase).maskCreditCard().build());
 		// sending the result back to a specific topic since Kafka Streams is from Kafka
 		// to Kafka
