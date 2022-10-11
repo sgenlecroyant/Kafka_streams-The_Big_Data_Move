@@ -36,17 +36,17 @@ public class PurchaseJoiner implements ValueJoiner<Purchase, Purchase, Correlate
 		
 		
 		this.secondPurchaseTime = secondPurchase != null? secondPurchase.getDateTime(): null;
-		this.secondPrice = secondPurchase != null ? secondPurchase.getAmount(): null;
+		this.secondPrice = secondPurchase != null ? secondPurchase.getAmount(): 0.0;
 		this.secondItemPurchased = secondPurchase != null ? secondPurchase.getItemName(): null;
 		
-		List<String> itemsPurchased = new ArrayList<>();
+		this.itemsPurchased = new ArrayList<>();
 		
 		if(firstItemPurchased != null) {
-			itemsPurchased.add(firstItemPurchased);
+			itemsPurchased.add(firstItemPurchased+ ":" +this.firstPrice);
 		}
 		
 		if(secondItemPurchased != null) {
-			itemsPurchased.add(secondItemPurchased);
+			itemsPurchased.add(secondItemPurchased+ ":" +this.secondPrice);
 		}
 		this.totalAmount = firstPrice + secondPrice;
 		

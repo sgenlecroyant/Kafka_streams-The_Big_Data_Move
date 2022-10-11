@@ -3,14 +3,23 @@ package com.sgen.kafkastreams.app.model;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.sgen.kafkastreams.app.pattern.CorrelatedPurchaseBuilder;
+import com.sgen.kafkastreams.app.util.CustomGenericLocalDateTimeDeserializer;
+import com.sgen.kafkastreams.app.util.CustomGenericLocalDateTimeSerializer;
 
 public class CorrelatedPurchase {
 
 	private String customerId;
 	private List<String> itemsPurchased;
 	private double totalAmount;
+	@JsonSerialize(using = CustomGenericLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomGenericLocalDateTimeDeserializer.class)
 	private LocalDateTime firstPurchaseTime;
+	
+	@JsonSerialize(using = CustomGenericLocalDateTimeSerializer.class)
+	@JsonDeserialize(using = CustomGenericLocalDateTimeDeserializer.class)
 	private LocalDateTime secondPurchaseTime;
 
 	public CorrelatedPurchase(CorrelatedPurchaseBuilder builder) {
@@ -40,7 +49,7 @@ public class CorrelatedPurchase {
 	public LocalDateTime getSecondPurchaseTime() {
 		return secondPurchaseTime;
 	}
-	
+
 	public static CorrelatedPurchaseBuilder newBuilder() {
 		return new CorrelatedPurchaseBuilder();
 	}

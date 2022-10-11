@@ -58,7 +58,7 @@ public class DataProducer {
 			ProducerRecord<String, Purchase> purchaseProducerRecord = new ProducerRecord<String, Purchase>("purchases",
 					purchase.getCustomerId(), purchase);
 			this.purchaseKafkaProducer.send(purchaseProducerRecord);
-			this.logger.info("published: {}", purchase);
+//			this.logger.info("published: {}", purchase);
 		} catch (Exception e) {
 			this.logger.error("failed to send purchase record due to: {}", e.getMessage());
 		}

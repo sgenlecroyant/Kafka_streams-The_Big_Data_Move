@@ -1,5 +1,7 @@
 package com.sgen.kafkastreams.app.streaming.purchase;
 
+import java.security.KeyStore;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -11,10 +13,16 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.JoinWindows;
+import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Predicate;
+import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
+import org.apache.kafka.streams.kstream.StreamJoined;
 import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
@@ -26,10 +34,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.kafka.support.KafkaStreamBrancher;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
+import com.sgen.kafkastreams.app.model.CorrelatedPurchase;
 import com.sgen.kafkastreams.app.model.Purchase;
 import com.sgen.kafkastreams.app.model.PurchasePattern;
 import com.sgen.kafkastreams.app.model.RewardAccumulator;
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
+import com.sgen.kafkastreams.app.streaming.joiner.PurchaseJoiner;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
 import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
 import com.sgen.kafkastreams.app.streaming.transformer.PurchaseTransformer;
@@ -90,6 +100,7 @@ public class PurchaseStream {
 
 		// Let's use the JSON SERDE HERE
 		Serde<Purchase> purchaseSerde = new JsonSerde<Purchase>(Purchase.class);
+		Serde<CorrelatedPurchase> correlatedPurchaseSerde = new JsonSerde<>(CorrelatedPurchase.class);
 
 		// the source processor which is reading from a Kafka Topic: hello-world
 		KStream<String, Purchase> purchasesSourceStream = streamsBuilder
@@ -106,14 +117,16 @@ public class PurchaseStream {
 		KafkaStreamBrancher<String, Purchase> purchaseStreamBrancher = 
 				new KafkaStreamBrancher<>();
 		
-		purchaseStreamBrancher
+		KStream<String, Purchase> coffeeSourceStream = 
+				purchaseStreamBrancher
 				.branch(isDepartmentCoffee, (coffeeStream) -> {
 					coffeeStream.to("coffee", Produced.with(keySerde, purchaseSerde));
-				})
+				}).onTopOf(purchasesSourceStream);
+		
+		
+		KStream<String, Purchase> electronicSourceStream = 
+				purchaseStreamBrancher
 				.branch(isDepartmentElectronics, (electronicStream) -> electronicStream.to("electronics", Produced.with(keySerde, purchaseSerde)))
-				.defaultBranch((stream) -> {
-					LOGGER.warn("UNEVALUATED PURCHASE: => ", stream.toString());
-				})
 				.onTopOf(purchasesSourceStream);
 		
 		
@@ -126,11 +139,34 @@ public class PurchaseStream {
 		KStream<String, PurchasePattern> purchasePatternStream = purchasesSourceStream.mapValues((purchase) -> PurchasePattern.builder(purchase).build());
 		
 		purchasePatternStream.to("patterns", Produced.with(keySerde, purchasePatternSerde));
-		// bulding the KafkaStreams instance to be able to start our Streaming App later on
+		// building the KafkaStreams instance to be able to start our Streaming App later on
+		String coffeeStream = "stream-branch-coffee";
+		String electronicStream = "stream-branch-electronics";
+		Map<String, KStream<String, Purchase>> coffeeAndElectronicStream = 
+					purchasesSourceStream
+					.split(Named.as("stream-branch-"))
+					.branch(isDepartmentCoffee, Branched.withFunction((stream) -> stream, "coffee"))
+					.branch(isDepartmentElectronics, Branched.withFunction((stream) -> stream, "electronics"))
+					.noDefaultBranch();
+		KStream<String, Purchase> coffeeStreamBranch = 
+				coffeeAndElectronicStream.get(coffeeStream);
+		coffeeStreamBranch.print(Printed.<String, Purchase>toSysOut()
+				.withLabel("COFFEE_ONLY_STREAMS_SPLIT => "));
+		KStream<String, Purchase> electronicStreamBranch = 
+				coffeeAndElectronicStream.get(electronicStream);
+		electronicStreamBranch.print(Printed.<String, Purchase>toSysOut().withLabel("ELECTRONICS_ONLY_STREAMS_SPLIT"));
+		
+		
+		JoinWindows oneMinuteJoinWindows = JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofMinutes(1));
+		
+		KStream<String, CorrelatedPurchase> correlatedPurchaseStream = coffeeStreamBranch.join(electronicStreamBranch, new PurchaseJoiner(), oneMinuteJoinWindows, StreamJoined.with(keySerde, purchaseSerde, purchaseSerde));
+		correlatedPurchaseStream.to("purchase-streams", Produced.<String, CorrelatedPurchase>with(keySerde, correlatedPurchaseSerde));
+		
+		
 		KafkaStreams kafkaStreams = globalKafkaStreamsConfig.getKafkaStreamsInstance(streamsBuilder, streamsConfig);
-
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();
+		
 		
 		
 //		 Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
