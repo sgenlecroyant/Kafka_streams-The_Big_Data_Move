@@ -1,26 +1,41 @@
 package com.sgen.kafkastreams.app.streaming.helloworld;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadLocalRandom;
 
 import org.apache.kafka.clients.producer.Callback;
 import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
-import com.sgen.kafkastreams.app.config.JsonConfig;
 import com.sgen.kafkastreams.app.config.PurchaseProducer;
 import com.sgen.kafkastreams.app.config.StringProducer;
 import com.sgen.kafkastreams.app.model.Purchase;
+import com.sgen.kafkastreams.app.model.StockTikerData;
+import com.sgen.kafkastreams.app.util.StockTickerDataSerializer;
 
 public class DataProducer {
+
+	private static Map<String, Object> stockTickerProducerConfigs = null;
+	private KafkaProducer<String, StockTikerData> stockTickerProducer = null;
+
+	static {
+		stockTickerProducerConfigs = new HashMap<>();
+		stockTickerProducerConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+		stockTickerProducerConfigs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+		stockTickerProducerConfigs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StockTickerDataSerializer.class);
+	}
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
 	private KafkaProducer<String, Purchase> purchaseKafkaProducer;
@@ -98,6 +113,61 @@ public class DataProducer {
 		Random random = new Random();
 		int creditcardNumberPosition = random.nextInt(0, 2);
 		return creditcardNumbers[creditcardNumberPosition];
+	}
+
+	public void generateStockTickerDataAndSend() {
+		this.stockTickerProducer = new KafkaProducer<>(stockTickerProducerConfigs);
+		logger.info("KStream vs KTable started");
+		for (int i = 1; i <= 3; i++) {
+			if (i == 2) {
+				logger.info("StockData updates sent");
+			}
+			this.sendToStockTickerStream(stockTickerProducer);
+			this.sendToStockTickerTable(stockTickerProducer);
+		}
+		logger.info("DOne sending Stock updates");
+	}
+
+	public void sendToStockTickerStream(KafkaProducer<String, StockTikerData> stockTickerProducer) {
+		String stockTickerStream = "stockticker-stream";
+
+		StockTikerData stockTikerData1 = new StockTikerData(new Random().nextInt(10, 30), "WORLD");
+		StockTikerData stockTikerData2 = new StockTikerData(new Random().nextInt(10, 30), "YORLD");
+		StockTikerData stockTikerData3 = new StockTikerData(new Random().nextInt(10, 30), "PORLD");
+
+		ProducerRecord<String, StockTikerData> stockTickerRecord1 = new ProducerRecord<String, StockTikerData>(
+				stockTickerStream, stockTikerData1.getSymbol(), stockTikerData1);
+		ProducerRecord<String, StockTikerData> stockTickerRecord2 = new ProducerRecord<String, StockTikerData>(
+				stockTickerStream, stockTikerData2.getSymbol(), stockTikerData2);
+		ProducerRecord<String, StockTikerData> stockTickerRecord3 = new ProducerRecord<String, StockTikerData>(
+				stockTickerStream, stockTikerData3.getSymbol(), stockTikerData3);
+		List<ProducerRecord<String, StockTikerData>> stockTickers = List
+				.<ProducerRecord<String, StockTikerData>>of(stockTickerRecord1, stockTickerRecord2, stockTickerRecord3);
+
+		stockTickerProducer.send(stockTickerRecord1);
+		stockTickerProducer.send(stockTickerRecord2);
+		stockTickerProducer.send(stockTickerRecord3);
+
+	}
+
+	public void sendToStockTickerTable(KafkaProducer<String, StockTikerData> stockTickerProducer) {
+		String stockTickerTable = "stockticker-table";
+
+		StockTikerData stockTikerData1 = new StockTikerData(new Random().nextInt(10, 30), "WORLD");
+		StockTikerData stockTikerData2 = new StockTikerData(new Random().nextInt(10, 30), "YORLD");
+		StockTikerData stockTikerData3 = new StockTikerData(new Random().nextInt(10, 30), "PORLD");
+
+		ProducerRecord<String, StockTikerData> stockTickerRecord1 = new ProducerRecord<String, StockTikerData>(
+				stockTickerTable, stockTikerData1.getSymbol(), stockTikerData1);
+		ProducerRecord<String, StockTikerData> stockTickerRecord2 = new ProducerRecord<String, StockTikerData>(
+				stockTickerTable, stockTikerData2.getSymbol(), stockTikerData2);
+		ProducerRecord<String, StockTikerData> stockTickerRecord3 = new ProducerRecord<String, StockTikerData>(
+				stockTickerTable, stockTikerData3.getSymbol(), stockTikerData3);
+
+		stockTickerProducer.send(stockTickerRecord1);
+		stockTickerProducer.send(stockTickerRecord2);
+		stockTickerProducer.send(stockTickerRecord3);
+
 	}
 
 }

@@ -1,13 +1,14 @@
 package com.sgen.kafkastreams.app.streaming.purchase;
 
-import java.security.KeyStore;
 import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.kafka.clients.admin.Config;
+import org.apache.kafka.clients.producer.KafkaProducer;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
@@ -16,8 +17,8 @@ import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.JoinWindows;
-import org.apache.kafka.streams.kstream.Joined;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Predicate;
 import org.apache.kafka.streams.kstream.Printed;
@@ -35,11 +36,14 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.kafka.support.KafkaStreamBrancher;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
+import com.fasterxml.jackson.databind.ser.std.StringSerializer;
 import com.sgen.kafkastreams.app.model.CorrelatedPurchase;
 import com.sgen.kafkastreams.app.model.Purchase;
 import com.sgen.kafkastreams.app.model.PurchasePattern;
 import com.sgen.kafkastreams.app.model.RewardAccumulator;
+import com.sgen.kafkastreams.app.model.StockTikerData;
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
+import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.joiner.PurchaseJoiner;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
 import com.sgen.kafkastreams.app.streaming.runner.StreamsRunner;
@@ -47,12 +51,15 @@ import com.sgen.kafkastreams.app.streaming.timestampextractor.PurchaseTimestampE
 import com.sgen.kafkastreams.app.streaming.transformer.PurchaseTransformer;
 import com.sgen.kafkastreams.app.streaming.util.StreamsUtil;
 import com.sgen.kafkastreams.app.thread.PurchaseGeneratorThread;
+import com.sgen.kafkastreams.app.util.StockTickerDataSerializer;
 
 @SpringBootApplication
 // // @formatter:off
 public class PurchaseStream {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
+
+	
 
 	private static Predicate<String, Purchase> isDepartmentCoffee = 
 			(key, purchase) -> {
@@ -154,17 +161,24 @@ public class PurchaseStream {
 					.noDefaultBranch();
 		KStream<String, Purchase> coffeeStreamBranch = 
 				coffeeAndElectronicStream.get(coffeeStream);
-		coffeeStreamBranch.print(Printed.<String, Purchase>toSysOut()
-				.withLabel("COFFEE_ONLY_STREAMS_SPLIT => "));
+//		coffeeStreamBranch.print(Printed.<String, Purchase>toSysOut().withLabel("COFFEE_ONLY_STREAMS_SPLIT => "));
 		KStream<String, Purchase> electronicStreamBranch = 
 				coffeeAndElectronicStream.get(electronicStream);
-		electronicStreamBranch.print(Printed.<String, Purchase>toSysOut().withLabel("ELECTRONICS_ONLY_STREAMS_SPLIT"));
+//		electronicStreamBranch.print(Printed.<String, Purchase>toSysOut().withLabel("ELECTRONICS_ONLY_STREAMS_SPLIT"));
 		
 		
 		JoinWindows oneMinuteJoinWindows = JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofMinutes(1));
 		
 		KStream<String, CorrelatedPurchase> correlatedPurchaseStream = coffeeStreamBranch.join(electronicStreamBranch, new PurchaseJoiner(), oneMinuteJoinWindows, StreamJoined.with(keySerde, purchaseSerde, purchaseSerde));
 		correlatedPurchaseStream.to("purchase-streams", Produced.<String, CorrelatedPurchase>with(keySerde, correlatedPurchaseSerde));
+		
+		KTable<String, StockTikerData> stockTickerTable = streamsBuilder.table("stockticker-table", Consumed.with(keySerde, new JsonSerde<>(StockTikerData.class)));
+		
+		KStream<String, StockTikerData> stockTickerStream = streamsBuilder.stream("stockticker-stream", Consumed.with(keySerde, new JsonSerde<>(StockTikerData.class)));
+		
+		
+		stockTickerTable.toStream().print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KTable"));
+		stockTickerStream.print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KStream"));
 		
 		
 		KafkaStreams kafkaStreams = globalKafkaStreamsConfig.getKafkaStreamsInstance(streamsBuilder, streamsConfig);
@@ -196,6 +210,10 @@ public class PurchaseStream {
 			Thread purchaseThread = new Thread(purchaseRunnable);
 			executorService.execute(purchaseThread);
 		}
-
+		
+		DataProducer dataProducer = new DataProducer();
+		dataProducer.generateStockTickerDataAndSend();
+		
+		
 	}
 }
