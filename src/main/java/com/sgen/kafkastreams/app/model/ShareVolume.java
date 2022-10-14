@@ -25,6 +25,14 @@ public class ShareVolume {
 	public String getIndustry() {
 		return industry;
 	}
+	
+	public ShareVolumeBuilder builder(StockTransaction stockTransaction) {
+		ShareVolumeBuilder builder = new ShareVolumeBuilder();
+		builder.setIndustry(stockTransaction.getIndustry());
+		builder.setShares(stockTransaction.getShares());
+		builder.setSymbol(stockTransaction.getSymbol());
+		return builder;
+	}
 
 	@Override
 	public String toString() {
