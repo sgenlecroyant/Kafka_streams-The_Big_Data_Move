@@ -225,6 +225,7 @@ public class PurchaseStream {
 			executorService.execute(purchaseThread);
 		}
 		
+		
 		DataProducer dataProducer = new DataProducer();
 //		dataProducer.generateStockTickerDataAndSend();
 		
