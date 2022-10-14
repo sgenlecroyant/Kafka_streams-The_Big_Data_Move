@@ -25,13 +25,31 @@ public class ShareVolume {
 	public String getIndustry() {
 		return industry;
 	}
-	
-	public ShareVolumeBuilder builder(StockTransaction stockTransaction) {
+
+	public static ShareVolumeBuilder builder(StockTransaction stockTransaction) {
 		ShareVolumeBuilder builder = new ShareVolumeBuilder();
 		builder.setIndustry(stockTransaction.getIndustry());
 		builder.setShares(stockTransaction.getShares());
 		builder.setSymbol(stockTransaction.getSymbol());
 		return builder;
+	}
+
+	public static ShareVolumeBuilder builder(ShareVolume shareVolume) {
+		ShareVolumeBuilder builder = new ShareVolumeBuilder();
+		builder.setIndustry(shareVolume.getIndustry());
+		builder.setShares(shareVolume.getShares());
+		builder.setSymbol(shareVolume.getSymbol());
+		return builder;
+	}
+
+	public static ShareVolume sum(ShareVolume shareVolume1, ShareVolume shareVolume2) {
+		ShareVolumeBuilder builder = builder(shareVolume1);
+		builder.setShares(builder.getShares() + shareVolume2.getShares());
+		return builder.build();
+	}
+
+	public static ShareVolumeBuilder builder() {
+		return new ShareVolumeBuilder();
 	}
 
 	@Override
