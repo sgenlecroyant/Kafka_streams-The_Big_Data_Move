@@ -14,8 +14,10 @@ import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
+import org.apache.kafka.streams.Topology.AutoOffsetReset;
 import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.Consumed;
+import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.JoinWindows;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
@@ -41,7 +43,10 @@ import com.sgen.kafkastreams.app.model.CorrelatedPurchase;
 import com.sgen.kafkastreams.app.model.Purchase;
 import com.sgen.kafkastreams.app.model.PurchasePattern;
 import com.sgen.kafkastreams.app.model.RewardAccumulator;
+import com.sgen.kafkastreams.app.model.ShareVolume;
 import com.sgen.kafkastreams.app.model.StockTikerData;
+import com.sgen.kafkastreams.app.model.StockTransaction;
+import com.sgen.kafkastreams.app.pattern.ShareVolumeBuilder;
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
 import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.joiner.PurchaseJoiner;
@@ -177,9 +182,18 @@ public class PurchaseStream {
 		KStream<String, StockTikerData> stockTickerStream = streamsBuilder.stream("stockticker-stream", Consumed.with(keySerde, new JsonSerde<>(StockTikerData.class)));
 		
 		
-		stockTickerTable.toStream().print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KTable"));
-		stockTickerStream.print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KStream"));
+//		stockTickerTable.toStream().print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KTable"));
+//		stockTickerStream.print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KStream"));
 		
+		KTable<String, ShareVolume> reducedShareVolumes = streamsBuilder.stream("stock-transactions", Consumed.with(keySerde, new JsonSerde<>(StockTransaction.class))
+				.withOffsetResetPolicy(AutoOffsetReset.LATEST))
+				.mapValues((stockTransaction) -> ShareVolume.builder(stockTransaction).build())
+				.groupBy((key, transaction) -> transaction.getSymbol(), Grouped.with(keySerde, new JsonSerde<>(ShareVolume.class)))
+				
+				.reduce(ShareVolume::sum);
+		
+//		reducedShareVolumes.toStream().print(Printed.<String, ShareVolume>toSysOut().withLabel("REDUCED_SHARE_VOLUMES"));
+		reducedShareVolumes.toStream().to("reduced-share-volumes", Produced.with(keySerde, new JsonSerde<>(ShareVolume.class)));
 		
 		KafkaStreams kafkaStreams = globalKafkaStreamsConfig.getKafkaStreamsInstance(streamsBuilder, streamsConfig);
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
@@ -212,8 +226,8 @@ public class PurchaseStream {
 		}
 		
 		DataProducer dataProducer = new DataProducer();
-		dataProducer.generateStockTickerDataAndSend();
+//		dataProducer.generateStockTickerDataAndSend();
 		
-		
+		dataProducer.generateRandomStockTransactions();
 	}
 }

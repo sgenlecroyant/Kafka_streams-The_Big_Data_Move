@@ -8,6 +8,10 @@ public class ShareVolume {
 	private int shares;
 	private String industry;
 
+	public ShareVolume() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public ShareVolume(ShareVolumeBuilder builder) {
 		this.symbol = builder.getSymbol();
 		this.shares = builder.getShares();

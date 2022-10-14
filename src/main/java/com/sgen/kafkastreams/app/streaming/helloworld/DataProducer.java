@@ -1,6 +1,7 @@
 package com.sgen.kafkastreams.app.streaming.helloworld;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -23,18 +24,30 @@ import com.sgen.kafkastreams.app.config.PurchaseProducer;
 import com.sgen.kafkastreams.app.config.StringProducer;
 import com.sgen.kafkastreams.app.model.Purchase;
 import com.sgen.kafkastreams.app.model.StockTikerData;
+import com.sgen.kafkastreams.app.model.StockTransaction;
 import com.sgen.kafkastreams.app.util.StockTickerDataSerializer;
+import com.sgen.kafkastreams.app.util.StockTransactionSerializer;
 
 public class DataProducer {
 
 	private static Map<String, Object> stockTickerProducerConfigs = null;
 	private KafkaProducer<String, StockTikerData> stockTickerProducer = null;
+	private KafkaProducer<String, StockTransaction> stockTransactionProducer;
+	private static Map<String, Object> stockTransactionsConfigs;
 
 	static {
 		stockTickerProducerConfigs = new HashMap<>();
 		stockTickerProducerConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
 		stockTickerProducerConfigs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 		stockTickerProducerConfigs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StockTickerDataSerializer.class);
+
+		// ============STOCK TRANSACTIONS===========
+
+		stockTransactionsConfigs = new HashMap<>();
+		stockTransactionsConfigs.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, "localhost:9092");
+		stockTransactionsConfigs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+		stockTransactionsConfigs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StockTransactionSerializer.class);
+
 	}
 
 	private Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -168,6 +181,38 @@ public class DataProducer {
 		stockTickerProducer.send(stockTickerRecord2);
 		stockTickerProducer.send(stockTickerRecord3);
 
+	}
+
+	public void generateRandomStockTransactions() {
+		stockTransactionProducer = new KafkaProducer<>(stockTransactionsConfigs);
+
+		while (true) {
+			generateStockTransaction();
+			try {
+				Thread.sleep(3000);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void generateStockTransaction() {
+		Faker faker = Faker.instance();
+		StockTransaction stockTransaction = StockTransaction.builder().withCustomerId(this.generateCreditCardNumber())
+				.withIndustry(faker.company().name()).withPurchase(new Random().nextBoolean())
+				.withSector(faker.commerce().department()).withSharePrice(new Random().nextDouble(1000, 3400))
+				.withShares(new Random().nextInt(23, 56)).withTransactionTimestamp(new Date())
+				.withSymbol(this.generateSymbol()).build();
+		String topic = "stock-transactions";
+		String key = stockTransaction.getCustomerId();
+		ProducerRecord<String, StockTransaction> stockTransactionRecord = new ProducerRecord<String, StockTransaction>(
+				topic, key, stockTransaction);
+		this.stockTransactionProducer.send(stockTransactionRecord);
+	}
+
+	private String generateSymbol() {
+		String[] symbols = { "WORLD", "YORLD", "JORLD" };
+		return symbols[new Random().nextInt(0, 3)];
 	}
 
 }
