@@ -32,6 +32,8 @@ public class GlobalKafkaStreamsConfig {
 		this.streamsProps.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, KafkaStreamsConfig.DEFAULT_KEY_SERIALIZER);
 		this.streamsProps.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG,
 				KafkaStreamsConfig.DEFAULT_VALUE_SERIALIZER);
+		this.streamsProps.put(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG, Integer.toString(100));
+
 //		this.streamsProps.put(StreamsConfig.DEFAULT_TIMESTAMP_EXTRACTOR_CLASS_CONFIG, PurchaseTimestampExtractor.class);
 
 		StreamsConfig streamsConfig = new StreamsConfig(streamsProps);

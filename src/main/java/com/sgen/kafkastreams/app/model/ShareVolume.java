@@ -1,9 +1,13 @@
 package com.sgen.kafkastreams.app.model;
 
+import java.io.Serializable;
+import java.util.Comparator;
+
 import com.sgen.kafkastreams.app.pattern.ShareVolumeBuilder;
 
-public class ShareVolume {
+public class ShareVolume implements Serializable, Comparable<ShareVolume> {
 
+	private static final long serialVersionUID = 1L;
 	private String symbol;
 	private int shares;
 	private String industry;
@@ -59,6 +63,11 @@ public class ShareVolume {
 	@Override
 	public String toString() {
 		return "ShareVolume [symbol=" + symbol + ", shares=" + shares + ", industry=" + industry + "]";
+	}
+
+	@Override
+	public int compareTo(ShareVolume o) {
+		return this.getShares();
 	}
 
 }

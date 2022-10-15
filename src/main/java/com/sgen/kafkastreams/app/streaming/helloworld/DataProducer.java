@@ -1,6 +1,5 @@
 package com.sgen.kafkastreams.app.streaming.helloworld;
 
-import java.security.interfaces.RSAPublicKey;
 import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.HashMap;
@@ -123,9 +122,10 @@ public class DataProducer {
 	}
 
 	private String generateCreditCardNumber() {
-		String[] creditcardNumbers = { "card-12-23-34", "card-56-67-78" };
+		String[] creditcardNumbers = { "card-12-23-34", "card-56-67-78", "card-12-23-64", "card-12-23-20",
+				"card-12-23-41", "card-12-23-90", "card-12-23-71", "card-12-23-74", "card-12-23-11", "card-12-23-00" };
 		Random random = new Random();
-		int creditcardNumberPosition = random.nextInt(0, 2);
+		int creditcardNumberPosition = random.nextInt(0, creditcardNumbers.length);
 		return creditcardNumbers[creditcardNumberPosition];
 	}
 
@@ -190,7 +190,7 @@ public class DataProducer {
 		while (true) {
 			generateStockTransaction();
 			try {
-				Thread.sleep(3000);
+				Thread.sleep(1500);
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}

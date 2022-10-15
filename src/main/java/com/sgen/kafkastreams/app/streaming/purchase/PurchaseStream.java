@@ -1,17 +1,18 @@
 package com.sgen.kafkastreams.app.streaming.purchase;
 
+import java.text.NumberFormat;
 import java.time.Duration;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.apache.kafka.clients.producer.KafkaProducer;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
 import org.apache.kafka.streams.KafkaStreams;
+import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology.AutoOffsetReset;
@@ -21,11 +22,12 @@ import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.JoinWindows;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
+import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Predicate;
-import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.StreamJoined;
+import org.apache.kafka.streams.kstream.ValueMapper;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier;
 import org.apache.kafka.streams.state.KeyValueStore;
@@ -38,7 +40,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.kafka.support.KafkaStreamBrancher;
 import org.springframework.kafka.support.serializer.JsonSerde;
 
-import com.fasterxml.jackson.databind.ser.std.StringSerializer;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.sgen.kafkastreams.app.model.CorrelatedPurchase;
 import com.sgen.kafkastreams.app.model.Purchase;
 import com.sgen.kafkastreams.app.model.PurchasePattern;
@@ -46,7 +48,6 @@ import com.sgen.kafkastreams.app.model.RewardAccumulator;
 import com.sgen.kafkastreams.app.model.ShareVolume;
 import com.sgen.kafkastreams.app.model.StockTikerData;
 import com.sgen.kafkastreams.app.model.StockTransaction;
-import com.sgen.kafkastreams.app.pattern.ShareVolumeBuilder;
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
 import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.joiner.PurchaseJoiner;
@@ -56,7 +57,7 @@ import com.sgen.kafkastreams.app.streaming.timestampextractor.PurchaseTimestampE
 import com.sgen.kafkastreams.app.streaming.transformer.PurchaseTransformer;
 import com.sgen.kafkastreams.app.streaming.util.StreamsUtil;
 import com.sgen.kafkastreams.app.thread.PurchaseGeneratorThread;
-import com.sgen.kafkastreams.app.util.StockTickerDataSerializer;
+import com.sgen.kafkastreams.app.util.FixedPriorityQueue;
 
 @SpringBootApplication
 // // @formatter:off
@@ -195,6 +196,47 @@ public class PurchaseStream {
 //		reducedShareVolumes.toStream().print(Printed.<String, ShareVolume>toSysOut().withLabel("REDUCED_SHARE_VOLUMES"));
 		reducedShareVolumes.toStream().to("reduced-share-volumes", Produced.with(keySerde, new JsonSerde<>(ShareVolume.class)));
 		
+		Comparator<ShareVolume> shareVolumeComparator = 
+				(shareVolume1, shareVolume2) -> shareVolume1.getShares() - shareVolume2.getShares();
+		Serde<ShareVolume> shareVolumeSerde = new JsonSerde<>(ShareVolume.class);
+			
+		FixedPriorityQueue<ShareVolume> fixedPriorityQueue = 
+				new FixedPriorityQueue<>(shareVolumeComparator, 5);
+		
+		
+//		reducedShareVolumes
+//		.groupBy((key, value) -> KeyValue.pair(value.getSymbol(), value), Grouped.with(keySerde, new JsonSerde<>(ShareVolume.class)))
+//		.aggregate(() -> fixedPriorityQueue,
+//				(key, shareVolume, aggregator) -> aggregator.add(shareVolume), 
+//				(key, shareVolume, aggregator) -> aggregator.remove(shareVolume),
+//				Materialized.with(keySerde, new JsonSerde<>(new TypeReference<FixedPriorityQueue<ShareVolume>>() {
+//				})))
+//				.mapValues(priorityQueueMapper)
+//				.toStream()
+//				.peek((key, shareVolume) -> {
+//					LOGGER.info("Stock Volume by industry {} {}", key, shareVolume);
+//				})
+//				.to("stock-volume-by-company", Produced.with(keySerde, keySerde));
+		
+		        streamsBuilder
+				.stream("stock-transactions", Consumed.with(keySerde, new JsonSerde<>(StockTransaction.class))
+				.withOffsetResetPolicy(AutoOffsetReset.LATEST))
+				.mapValues((key, value) -> ShareVolume.builder(value).build())
+				.groupBy((key, value) -> value.getSymbol(), Grouped.with(keySerde, shareVolumeSerde))
+				.reduce((v1, v2) -> ShareVolume.sum(v1, v2))
+				.groupBy((key, value) -> KeyValue.pair(value.getSymbol(), value), Grouped.with(keySerde, shareVolumeSerde))
+				.aggregate(() -> fixedPriorityQueue,
+						(key, value, aggregator) -> aggregator.add(value),
+						(key, value, aggregator) -> aggregator.remove(value),
+						Materialized.with(keySerde, new JsonSerde<>(new TypeReference<FixedPriorityQueue<ShareVolume>>() {
+						})))
+						.mapValues(priorityQueueMapper)
+						.toStream()
+						.peek((key, value) -> LOGGER.info("Stock Volume by industry {} {}", key, value))
+						.to("stock-volume-by-company", Produced.with(keySerde, keySerde));
+		
+		
+		
 		KafkaStreams kafkaStreams = globalKafkaStreamsConfig.getKafkaStreamsInstance(streamsBuilder, streamsConfig);
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();
@@ -231,4 +273,19 @@ public class PurchaseStream {
 		
 		dataProducer.generateRandomStockTransactions();
 	}
+	private static NumberFormat numberFormat = NumberFormat.getInstance();
+	public static ValueMapper<FixedPriorityQueue<ShareVolume>, String> priorityQueueMapper = (fixedPriorityQueue) -> {
+		StringBuilder topShareVolumesAsString = new StringBuilder();
+		Iterator<ShareVolume> iterator = fixedPriorityQueue.iterate();
+		int count = 0;
+		while(iterator.hasNext()) {
+			ShareVolume shareVolume = iterator.next();
+			if(shareVolume != null) {
+				System.out.println("SIZE NOW: " +fixedPriorityQueue.getInner().size());
+				topShareVolumesAsString.append(count++).append(")").append(shareVolume.getSymbol())
+				.append(":").append(numberFormat.format(shareVolume.getShares())).append(", Industry: " +shareVolume.getIndustry()).append(" ");
+			}
+		}
+		return topShareVolumesAsString.toString();
+	};
 }

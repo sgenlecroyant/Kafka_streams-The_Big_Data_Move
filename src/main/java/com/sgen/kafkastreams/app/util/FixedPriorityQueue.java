@@ -8,6 +8,10 @@ public class FixedPriorityQueue<T> {
 	private TreeSet<T> inner;
 	private int maxSize;
 
+	public FixedPriorityQueue() {
+		// TODO Auto-generated constructor stub
+	}
+
 	public FixedPriorityQueue(Comparator<T> comparator, int maxSize) {
 		this.inner = new TreeSet<>(comparator);
 		this.maxSize = maxSize;
@@ -16,7 +20,7 @@ public class FixedPriorityQueue<T> {
 	public FixedPriorityQueue<T> add(T element) {
 		this.inner.add(element);
 		if (this.inner.size() > maxSize) {
-			this.inner.pollLast();
+			this.inner.pollFirst();
 		}
 		return this;
 	}
@@ -30,6 +34,22 @@ public class FixedPriorityQueue<T> {
 
 	public Iterator<T> iterate() {
 		return this.inner.iterator();
+	}
+
+	public TreeSet<T> getInner() {
+		return inner;
+	}
+
+	public void setInner(TreeSet<T> inner) {
+		this.inner = inner;
+	}
+
+	public int getMaxSize() {
+		return maxSize;
+	}
+
+	public void setMaxSize(int maxSize) {
+		this.maxSize = maxSize;
 	}
 
 	@Override
