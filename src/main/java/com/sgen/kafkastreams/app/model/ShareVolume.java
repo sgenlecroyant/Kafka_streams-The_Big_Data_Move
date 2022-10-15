@@ -66,8 +66,8 @@ public class ShareVolume implements Serializable, Comparable<ShareVolume> {
 	}
 
 	@Override
-	public int compareTo(ShareVolume o) {
-		return this.getShares();
+	public int compareTo(ShareVolume otherShareVolume) {
+		return this.getShares() - otherShareVolume.getShares();
 	}
 
 }

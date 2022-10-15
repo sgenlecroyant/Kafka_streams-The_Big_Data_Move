@@ -277,7 +277,7 @@ public class PurchaseStream {
 	public static ValueMapper<FixedPriorityQueue<ShareVolume>, String> priorityQueueMapper = (fixedPriorityQueue) -> {
 		StringBuilder topShareVolumesAsString = new StringBuilder();
 		Iterator<ShareVolume> iterator = fixedPriorityQueue.iterate();
-		int count = 0;
+		int count = 1;
 		while(iterator.hasNext()) {
 			ShareVolume shareVolume = iterator.next();
 			if(shareVolume != null) {
