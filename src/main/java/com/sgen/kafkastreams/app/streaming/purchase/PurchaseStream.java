@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -20,6 +21,7 @@ import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.JoinWindows;
+import org.apache.kafka.streams.kstream.KGroupedStream;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
@@ -33,6 +35,7 @@ import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
 import org.apache.kafka.streams.state.Stores;
+import org.rocksdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -218,24 +221,36 @@ public class PurchaseStream {
 //				})
 //				.to("stock-volume-by-company", Produced.with(keySerde, keySerde));
 		
-		        streamsBuilder
+		
+		        KStream<String, StockTransaction> stockTransactionStream = streamsBuilder
 				.stream("stock-transactions", Consumed.with(keySerde, new JsonSerde<>(StockTransaction.class))
-				.withOffsetResetPolicy(AutoOffsetReset.LATEST))
-				.mapValues((key, value) -> ShareVolume.builder(value).build())
-				.groupBy((key, value) -> value.getSymbol(), Grouped.with(keySerde, shareVolumeSerde))
-				.reduce((v1, v2) -> ShareVolume.sum(v1, v2))
-				.groupBy((key, value) -> KeyValue.pair(value.getSymbol(), value), Grouped.with(keySerde, shareVolumeSerde))
-				.aggregate(() -> fixedPriorityQueue,
-						(key, value, aggregator) -> aggregator.add(value),
-						(key, value, aggregator) -> aggregator.remove(value),
-						Materialized.with(keySerde, new JsonSerde<>(new TypeReference<FixedPriorityQueue<ShareVolume>>() {
-						})))
-						.mapValues(priorityQueueMapper)
-						.toStream()
-						.peek((key, value) -> LOGGER.info("Stock Volume by industry {} {}", key, value))
-						.to("stock-volume-by-company", Produced.with(keySerde, keySerde));
+				.withOffsetResetPolicy(AutoOffsetReset.LATEST));
+		        
+				stockTransactionStream.mapValues((key, value) -> ShareVolume.builder(value).build())
+							.groupBy((key, value) -> value.getIndustry(), Grouped.with(keySerde, shareVolumeSerde))
+							.reduce((v1, v2) -> ShareVolume.sum(v1, v2))
+							.groupBy((key, value) -> KeyValue.pair(value.getIndustry(), value), Grouped.with(keySerde, shareVolumeSerde))
+							.aggregate(() -> fixedPriorityQueue,
+									(key, value, aggregator) -> aggregator.add(value),
+									(key, value, aggregator) -> aggregator.remove(value),
+									Materialized.with(keySerde, new JsonSerde<>(new TypeReference<FixedPriorityQueue<ShareVolume>>() {
+									})))
+									.mapValues(priorityQueueMapper)
+									.toStream()
+									.peek((key, value) -> LOGGER.info("Stock Volume by industry {} {}", key, value))
+									.to("stock-volume-by-company", Produced.with(keySerde, keySerde));
 		
-		
+
+//				stockTransactionStream
+//				.mapValues((transaction) -> ShareVolume.builder(transaction).build())
+//				.groupBy((key, value) -> value.getIndustry(), Grouped.with(keySerde, shareVolumeSerde))
+//				.reduce(ShareVolume::sum)
+//				.groupBy((key, value) -> new KeyValue<>(value.getIndustry(), value), Grouped.with(keySerde, shareVolumeSerde))
+//				.aggregate(() -> fixedPriorityQueue,
+//						(key, value, aggregator) -> aggregator.add(value),
+//						(key, value, aggregator) -> aggregator.remove(value),
+//						Named.as("aggregated-"),
+//						Materialized.with(keySerde, new JsonSerde<>(new TypeReference<FixedPriorityQueue<ShareVolume>>() {})));
 		
 		KafkaStreams kafkaStreams = globalKafkaStreamsConfig.getKafkaStreamsInstance(streamsBuilder, streamsConfig);
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
