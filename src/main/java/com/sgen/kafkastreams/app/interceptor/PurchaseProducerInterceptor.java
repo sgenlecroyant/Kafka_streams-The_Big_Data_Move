@@ -17,6 +17,7 @@ public class PurchaseProducerInterceptor implements ProducerInterceptor<Object, 
 	@Override
 	public ProducerRecord<Object, Object> onSend(ProducerRecord<Object, Object> record) {
 		System.out.println("Produced: " + record);
+
 		return record;
 	}
 
