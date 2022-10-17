@@ -6,7 +6,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.TreeSet;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -21,7 +20,6 @@ import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Grouped;
 import org.apache.kafka.streams.kstream.JoinWindows;
-import org.apache.kafka.streams.kstream.KGroupedStream;
 import org.apache.kafka.streams.kstream.KStream;
 import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
@@ -29,13 +27,15 @@ import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Predicate;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.StreamJoined;
+import org.apache.kafka.streams.kstream.TimeWindows;
 import org.apache.kafka.streams.kstream.ValueMapper;
+import org.apache.kafka.streams.kstream.Windowed;
+import org.apache.kafka.streams.kstream.WindowedSerdes;
 import org.apache.kafka.streams.processor.TimestampExtractor;
 import org.apache.kafka.streams.state.KeyValueBytesStoreSupplier;
 import org.apache.kafka.streams.state.KeyValueStore;
 import org.apache.kafka.streams.state.StoreBuilder;
 import org.apache.kafka.streams.state.Stores;
-import org.rocksdb.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -51,6 +51,7 @@ import com.sgen.kafkastreams.app.model.RewardAccumulator;
 import com.sgen.kafkastreams.app.model.ShareVolume;
 import com.sgen.kafkastreams.app.model.StockTikerData;
 import com.sgen.kafkastreams.app.model.StockTransaction;
+import com.sgen.kafkastreams.app.model.TransactionSummary;
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
 import com.sgen.kafkastreams.app.streaming.helloworld.DataProducer;
 import com.sgen.kafkastreams.app.streaming.joiner.PurchaseJoiner;
@@ -85,6 +86,7 @@ public class PurchaseStream {
 						return false;
 					};
 
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
 		SpringApplication.run(PurchaseStream.class, args);
 
@@ -123,6 +125,7 @@ public class PurchaseStream {
 		// Our PurchaseTimestampExtractor
 		TimestampExtractor purchaseTimestampExtractor = new PurchaseTimestampExtractor();
 		// the source processor which is reading from a Kafka Topic: hello-world
+		
 		KStream<String, Purchase> purchasesSourceStream = streamsBuilder
 				.stream("purchases", Consumed.with(keySerde, purchaseSerde).withTimestampExtractor(purchaseTimestampExtractor))
 				.mapValues((purchase) -> Purchase.newBuilder(purchase).maskCreditCard().build());
@@ -239,19 +242,21 @@ public class PurchaseStream {
 									.toStream()
 									.peek((key, value) -> LOGGER.info("Stock Volume by industry {} {}", key, value))
 									.to("stock-volume-by-company", Produced.with(keySerde, keySerde));
+		Serde<TransactionSummary> transactionSummarySerde = new JsonSerde<>(TransactionSummary.class);
+		Serde<StockTransaction> stockTransactionSerde = new JsonSerde<>(StockTransaction.class);
+		Duration windowLength = Duration.ofMinutes(2);
 		
+		Serde<Windowed<String>> windowSerde = WindowedSerdes.timeWindowedSerdeFrom(String.class, windowLength.toMillis());
 
-//				stockTransactionStream
-//				.mapValues((transaction) -> ShareVolume.builder(transaction).build())
-//				.groupBy((key, value) -> value.getIndustry(), Grouped.with(keySerde, shareVolumeSerde))
-//				.reduce(ShareVolume::sum)
-//				.groupBy((key, value) -> new KeyValue<>(value.getIndustry(), value), Grouped.with(keySerde, shareVolumeSerde))
-//				.aggregate(() -> fixedPriorityQueue,
-//						(key, value, aggregator) -> aggregator.add(value),
-//						(key, value, aggregator) -> aggregator.remove(value),
-//						Named.as("aggregated-"),
-//						Materialized.with(keySerde, new JsonSerde<>(new TypeReference<FixedPriorityQueue<ShareVolume>>() {})));
+				JsonSerde<KeyValue<String, StockTransaction>> jsonSerde = new JsonSerde<>(new TypeReference<KeyValue<String, StockTransaction>>() {});
 		
+		stockTransactionStream
+				.groupByKey()
+				.windowedBy(TimeWindows.ofSizeWithNoGrace(windowLength))
+				.reduce(StockTransaction::reduce)
+				.toStream()
+				.to("windowed-transactions", Produced.with(windowSerde, stockTransactionSerde));
+
 		KafkaStreams kafkaStreams = globalKafkaStreamsConfig.getKafkaStreamsInstance(streamsBuilder, streamsConfig);
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();

@@ -62,7 +62,7 @@ public class StockTransaction {
 		return purchase;
 	}
 
-	public StockTransaction reduce(StockTransaction transaction1, StockTransaction transaction2) {
+	public static StockTransaction reduce(StockTransaction transaction1, StockTransaction transaction2) {
 		StockTransactionBuilder builder = StockTransaction.builder(transaction1);
 		builder.withShares(transaction1.getShares() + transaction2.getShares());
 		return builder.build();
