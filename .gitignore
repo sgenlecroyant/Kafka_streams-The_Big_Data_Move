@@ -33,5 +33,9 @@ build/
 .vscode/
 
 
+<<<<<<< HEAD
 =============
 /features
+=======
+features
+>>>>>>> aa62131 (removed tracking file)
