@@ -11,6 +11,7 @@ import com.sgen.kafkastreams.app.util.CustomGenericLocalDateTimeSerializer;
 public class Purchase {
 
 	private Integer id;
+	private String customerId;
 	private String itemName;
 	private Integer quantity;
 	private double amount;
@@ -19,6 +20,7 @@ public class Purchase {
 	private LocalDateTime dateTime;
 	private String location;
 	private String creditcardNumber;
+	private String department;
 
 	public Purchase() {
 		// TODO Auto-generated constructor stub
@@ -26,12 +28,14 @@ public class Purchase {
 
 	public Purchase(PurchaseBuilder builder) {
 		this.id = builder.getId();
+		this.customerId = builder.getCustomerId();
 		this.itemName = builder.getItemName();
 		this.quantity = builder.getQuantity();
 		this.amount = builder.getAmount();
 		this.dateTime = builder.getDateTime();
 		this.location = builder.getLocation();
 		this.creditcardNumber = builder.getCreditcardNumber();
+		this.department = builder.getDepartment();
 	}
 
 	public Integer getId() {
@@ -50,6 +54,10 @@ public class Purchase {
 		return amount;
 	}
 
+	public String getDepartment() {
+		return department;
+	}
+
 	public LocalDateTime getDateTime() {
 		return dateTime;
 	}
@@ -60,6 +68,10 @@ public class Purchase {
 
 	public String getCreditcardNumber() {
 		return creditcardNumber;
+	}
+
+	public String getCustomerId() {
+		return customerId;
 	}
 
 	public static PurchaseBuilder builder() {
@@ -75,7 +87,8 @@ public class Purchase {
 	@Override
 	public String toString() {
 		return "Purchase [id=" + id + ", itemName=" + itemName + ", quantity=" + quantity + ", amount=" + amount
-				+ ", dateTime=" + dateTime + "]";
+				+ ", dateTime=" + dateTime + ", location=" + location + ", creditcardNumber=" + creditcardNumber
+				+ ", department=" + department + "]";
 	}
 
 }

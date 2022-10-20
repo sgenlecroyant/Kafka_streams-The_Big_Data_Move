@@ -13,6 +13,7 @@ import com.sgen.kafkastreams.app.model.Purchase;
 class PurchaseBuilderTest {
 
 	private Faker faker = new Faker();
+	private String customerId = "customer-id";
 
 	@Test
 	@DisplayName("SUCCESS TEST: PURCHASE BUILDER PATTERN")
@@ -25,16 +26,19 @@ class PurchaseBuilderTest {
 		int quantity = 23;
 		int amount = 1000;
 		String creditcardNumber = faker.business().creditCardNumber();
+		String department = "department";
 		Purchase purchase = 
 				Purchase
 				.builder()
 				.id(1)
+				.customerId(customerId)
 				.itemName(itemName)
 				.amount(amount)
 				.dateTime(LocalDateTime.now())
 				.location(location)
 				.quantity(quantity)
 				.creditcardNumber(creditcardNumber)
+				.department(department)
 				.build();
 		// When
 //		assertThat(purchase.getLocation()).isEqualTo(location);
@@ -52,15 +56,20 @@ class PurchaseBuilderTest {
 		String location = "NewYork City";
 		int quantity = 23;
 		int amount = 1000;
+		String id = "id sskskks";
+		String department = "department";
 		String creditcardNumber = faker.business().creditCardNumber();
 		Purchase purchase = 
 				Purchase
 				.builder()
 				.itemName(itemName)
+				.customerId(customerId)
 				.amount(amount)
 				.dateTime(LocalDateTime.now())
 				.location(location)
 				.quantity(quantity)
+				.department(department)
+				.id(12)
 				.creditcardNumber(creditcardNumber)
 				.build();
 		// When
@@ -73,15 +82,18 @@ class PurchaseBuilderTest {
 	@DisplayName("NEW BUILDER: WITH EXTERNAL SOURCE")
 	public void testNewBuilderMethod() {
 		String creditcardNumber = faker.business().creditCardNumber();
+		String department = "department";
 		Purchase purchase = 
 				Purchase.builder()
 				.id(1000)
+				.customerId(customerId)
 				.itemName("ItemName")
 				.amount(1200)
 				.quantity(34)
 				.dateTime(LocalDateTime.now())
 				.location("location")
 				.creditcardNumber(creditcardNumber)
+				.department(department)
 				.build();
 		Purchase newPurchase = 
 				Purchase.newBuilder(purchase)

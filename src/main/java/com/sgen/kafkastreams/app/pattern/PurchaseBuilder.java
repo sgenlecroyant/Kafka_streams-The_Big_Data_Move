@@ -9,12 +9,14 @@ import com.sgen.kafkastreams.app.model.Purchase;
 public class PurchaseBuilder {
 
 	private Integer id;
+	private String customerId;
 	private String itemName;
 	private Integer quantity;
 	private double amount;
 	private LocalDateTime dateTime;
 	private String location;
 	private String creditcardNumber;
+	private String department;
 
 	public PurchaseBuilder() {
 		// TODO Auto-generated constructor stub
@@ -22,16 +24,23 @@ public class PurchaseBuilder {
 
 	public PurchaseBuilder(Purchase purchase) {
 		this.id = purchase.getId();
+		this.customerId = purchase.getCustomerId();
 		this.itemName = purchase.getItemName();
 		this.amount = purchase.getAmount();
 		this.dateTime = purchase.getDateTime();
 		this.location = purchase.getLocation();
 		this.quantity = purchase.getQuantity();
 		this.creditcardNumber = purchase.getCreditcardNumber();
+		this.department = purchase.getDepartment();
 	}
 
 	public PurchaseBuilder id(Integer id) {
 		this.id = id;
+		return this;
+	}
+
+	public PurchaseBuilder customerId(String customerId) {
+		this.customerId = customerId;
 		return this;
 	}
 
@@ -52,6 +61,11 @@ public class PurchaseBuilder {
 
 	public PurchaseBuilder creditcardNumber(String creditcardNummber) {
 		this.creditcardNumber = creditcardNummber;
+		return this;
+	}
+
+	public PurchaseBuilder department(String department) {
+		this.department = department;
 		return this;
 	}
 
@@ -98,6 +112,14 @@ public class PurchaseBuilder {
 
 	public String getCreditcardNumber() {
 		return creditcardNumber;
+	}
+
+	public String getCustomerId() {
+		return customerId;
+	}
+
+	public String getDepartment() {
+		return department;
 	}
 
 	public Purchase build() {
