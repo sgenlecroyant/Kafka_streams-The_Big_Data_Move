@@ -1,6 +1,5 @@
 package com.sgen.kafkastreams.app.streaming.purchase;
 
-import java.lang.Thread.UncaughtExceptionHandler;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.Comparator;
@@ -18,7 +17,6 @@ import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology.AutoOffsetReset;
 import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
-import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse;
 import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Grouped;
@@ -28,6 +26,7 @@ import org.apache.kafka.streams.kstream.KTable;
 import org.apache.kafka.streams.kstream.Materialized;
 import org.apache.kafka.streams.kstream.Named;
 import org.apache.kafka.streams.kstream.Predicate;
+import org.apache.kafka.streams.kstream.Printed;
 import org.apache.kafka.streams.kstream.Produced;
 import org.apache.kafka.streams.kstream.StreamJoined;
 import org.apache.kafka.streams.kstream.TimeWindows;
@@ -176,10 +175,10 @@ public class PurchaseStream {
 					.noDefaultBranch();
 		KStream<String, Purchase> coffeeStreamBranch = 
 				coffeeAndElectronicStream.get(coffeeStream);
-//		coffeeStreamBranch.print(Printed.<String, Purchase>toSysOut().withLabel("COFFEE_ONLY_STREAMS_SPLIT => "));
+		coffeeStreamBranch.print(Printed.<String, Purchase>toSysOut().withLabel("COFFEE_ONLY_STREAMS_SPLIT => "));
 		KStream<String, Purchase> electronicStreamBranch = 
 				coffeeAndElectronicStream.get(electronicStream);
-//		electronicStreamBranch.print(Printed.<String, Purchase>toSysOut().withLabel("ELECTRONICS_ONLY_STREAMS_SPLIT"));
+		electronicStreamBranch.print(Printed.<String, Purchase>toSysOut().withLabel("ELECTRONICS_ONLY_STREAMS_SPLIT"));
 		
 		
 		JoinWindows oneMinuteJoinWindows = JoinWindows.ofTimeDifferenceWithNoGrace(Duration.ofMinutes(1));
@@ -192,8 +191,8 @@ public class PurchaseStream {
 		KStream<String, StockTikerData> stockTickerStream = streamsBuilder.stream("stockticker-stream", Consumed.with(keySerde, new JsonSerde<>(StockTikerData.class)));
 		
 		
-//		stockTickerTable.toStream().print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KTable"));
-//		stockTickerStream.print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KStream"));
+		stockTickerTable.toStream().print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KTable"));
+		stockTickerStream.print(Printed.<String, StockTikerData>toSysOut().withLabel("Stocks-KStream"));
 		
 		KTable<String, ShareVolume> reducedShareVolumes = streamsBuilder.stream("stock-transactions", Consumed.with(keySerde, new JsonSerde<>(StockTransaction.class))
 				.withOffsetResetPolicy(AutoOffsetReset.LATEST))
@@ -202,7 +201,7 @@ public class PurchaseStream {
 				
 				.reduce(ShareVolume::sum);
 		
-//		reducedShareVolumes.toStream().print(Printed.<String, ShareVolume>toSysOut().withLabel("REDUCED_SHARE_VOLUMES"));
+		reducedShareVolumes.toStream().print(Printed.<String, ShareVolume>toSysOut().withLabel("REDUCED_SHARE_VOLUMES"));
 		reducedShareVolumes.toStream().to("reduced-share-volumes", Produced.with(keySerde, new JsonSerde<>(ShareVolume.class)));
 		
 		Comparator<ShareVolume> shareVolumeComparator = 
@@ -213,19 +212,19 @@ public class PurchaseStream {
 				new FixedPriorityQueue<>(shareVolumeComparator, 5);
 		
 		
-//		reducedShareVolumes
-//		.groupBy((key, value) -> KeyValue.pair(value.getSymbol(), value), Grouped.with(keySerde, new JsonSerde<>(ShareVolume.class)))
-//		.aggregate(() -> fixedPriorityQueue,
-//				(key, shareVolume, aggregator) -> aggregator.add(shareVolume), 
-//				(key, shareVolume, aggregator) -> aggregator.remove(shareVolume),
-//				Materialized.with(keySerde, new JsonSerde<>(new TypeReference<FixedPriorityQueue<ShareVolume>>() {
-//				})))
-//				.mapValues(priorityQueueMapper)
-//				.toStream()
-//				.peek((key, shareVolume) -> {
-//					LOGGER.info("Stock Volume by industry {} {}", key, shareVolume);
-//				})
-//				.to("stock-volume-by-company", Produced.with(keySerde, keySerde));
+		reducedShareVolumes
+		.groupBy((key, value) -> KeyValue.pair(value.getSymbol(), value), Grouped.with(keySerde, new JsonSerde<>(ShareVolume.class)))
+		.aggregate(() -> fixedPriorityQueue,
+				(key, shareVolume, aggregator) -> aggregator.add(shareVolume), 
+				(key, shareVolume, aggregator) -> aggregator.remove(shareVolume),
+				Materialized.with(keySerde, new JsonSerde<>(new TypeReference<FixedPriorityQueue<ShareVolume>>() {
+				})))
+				.mapValues(priorityQueueMapper)
+				.toStream()
+				.peek((key, shareVolume) -> {
+					LOGGER.info("Stock Volume by industry {} {}", key, shareVolume);
+				})
+				.to("stock-volume-by-company", Produced.with(keySerde, keySerde));
 		
 		
 		        KStream<String, StockTransaction> stockTransactionStream = streamsBuilder
@@ -276,21 +275,21 @@ public class PurchaseStream {
 		
 		
 		
-//		 Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
-//
-//		DataProducer randomPurchaseProducer = new DataProducer();
-//
-//		AtomicInteger countPurchase = new AtomicInteger(0);
+		 Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
 
+		DataProducer randomPurchaseProducer = new DataProducer();
 		
-//		while (true) {
-//			countPurchase.getAndIncrement();
-//			countPurchase.incrementAndGet();
-//			randomPurchaseProducer.sendRandomPurchase();
-//			LOGGER.info("count: " + countPurchase + ", THREAD: " + Thread.currentThread().getName());
-//		}
-
+		boolean generating = true;
+		int count = 0;
+		while (generating) {
+			randomPurchaseProducer.sendRandomPurchase();
+			LOGGER.info("THREAD: " + Thread.currentThread().getName());
+			if(count++ == 20) {
+				generating = false;
+			}
+		}
 		int dummyThreads = 5;
+
 		ExecutorService executorService = Executors.newFixedThreadPool(dummyThreads);
 
 		for (int threadCount = 0; threadCount <= dummyThreads; threadCount++) {
@@ -302,7 +301,7 @@ public class PurchaseStream {
 		
 		
 		DataProducer dataProducer = new DataProducer();
-//		dataProducer.generateStockTickerDataAndSend();
+		dataProducer.generateStockTickerDataAndSend();
 		
 		dataProducer.generateRandomStockTransactions();
 	}
