@@ -1,5 +1,6 @@
 package com.sgen.kafkastreams.app.streaming.purchase;
 
+import java.lang.Thread.UncaughtExceptionHandler;
 import java.text.NumberFormat;
 import java.time.Duration;
 import java.util.Comparator;
@@ -16,6 +17,8 @@ import org.apache.kafka.streams.KeyValue;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.Topology.AutoOffsetReset;
+import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler;
+import org.apache.kafka.streams.errors.StreamsUncaughtExceptionHandler.StreamThreadExceptionResponse;
 import org.apache.kafka.streams.kstream.Branched;
 import org.apache.kafka.streams.kstream.Consumed;
 import org.apache.kafka.streams.kstream.Grouped;
@@ -258,6 +261,16 @@ public class PurchaseStream {
 				.to("windowed-transactions", Produced.with(windowSerde, stockTransactionSerde));
 
 		KafkaStreams kafkaStreams = globalKafkaStreamsConfig.getKafkaStreamsInstance(streamsBuilder, streamsConfig);
+		kafkaStreams.setUncaughtExceptionHandler(new StreamsUncaughtExceptionHandler() {
+			
+			@Override
+			public StreamThreadExceptionResponse handle(Throwable exception) {
+				if(exception != null) {
+					return StreamThreadExceptionResponse.SHUTDOWN_CLIENT;
+				}
+				return StreamThreadExceptionResponse.REPLACE_THREAD;
+			}
+		});
 		StreamsRunner streamsRunner = new DefaultStreamsRunner(kafkaStreams);
 		streamsRunner.start();
 		

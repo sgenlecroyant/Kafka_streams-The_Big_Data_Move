@@ -31,6 +31,7 @@ public class GlobalKafkaStreamsConfig {
 	}
 
 	public StreamsConfig applyDefaultConfigSettings() {
+
 		this.streamsProps.put(StreamsConfig.APPLICATION_ID_CONFIG, KafkaStreamsConfig.APP_ID);
 		this.streamsProps.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaStreamsConfig.BOOTSTRAP_SERVER);
 		this.streamsProps.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, KafkaStreamsConfig.DEFAULT_KEY_SERIALIZER);
