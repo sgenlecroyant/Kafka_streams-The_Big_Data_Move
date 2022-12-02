@@ -4,6 +4,8 @@ import org.apache.kafka.streams.KafkaStreams;
 import org.apache.kafka.streams.StreamsBuilder;
 import org.apache.kafka.streams.StreamsConfig;
 import org.apache.kafka.streams.kstream.KStream;
+import org.apache.kafka.streams.kstream.internals.KStreamImpl;
+import org.springframework.kafka.config.KafkaStreamsInfrastructureCustomizer;
 
 import com.sgen.kafkastreams.app.streaming.config.GlobalKafkaStreamsConfig;
 import com.sgen.kafkastreams.app.streaming.runner.DefaultStreamsRunner;
