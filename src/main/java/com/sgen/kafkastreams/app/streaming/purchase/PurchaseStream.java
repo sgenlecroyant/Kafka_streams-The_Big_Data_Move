@@ -8,6 +8,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.function.Function;
 
 import org.apache.kafka.common.serialization.Serde;
 import org.apache.kafka.common.serialization.Serdes;
@@ -70,7 +71,6 @@ import com.sgen.kafkastreams.app.util.FixedPriorityQueue;
 public class PurchaseStream {
 	
 	private static final Logger LOGGER = LoggerFactory.getLogger(PurchaseStream.class);
-
 	
 
 	private static Predicate<String, Purchase> isDepartmentCoffee = 
@@ -78,6 +78,7 @@ public class PurchaseStream {
 				if(purchase.getDepartment() != null) {
 					return purchase.getDepartment().equalsIgnoreCase("coffee");
 				}
+				
 				return false;
 			};
 	private static Predicate<String, Purchase> isDepartmentElectronics = 
@@ -289,6 +290,7 @@ public class PurchaseStream {
 			}
 		}
 		int dummyThreads = 5;
+		
 
 		ExecutorService executorService = Executors.newFixedThreadPool(dummyThreads);
 
@@ -310,6 +312,7 @@ public class PurchaseStream {
 		StringBuilder topShareVolumesAsString = new StringBuilder();
 		Iterator<ShareVolume> iterator = fixedPriorityQueue.iterate();
 		int count = 1;
+	
 		while(iterator.hasNext()) {
 			ShareVolume shareVolume = iterator.next();
 			if(shareVolume != null) {

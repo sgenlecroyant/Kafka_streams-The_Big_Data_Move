@@ -9,5 +9,7 @@ public class StreamsUtil {
 	public static final Predicate<String, Purchase> isCheap(){
 		return (key, purchase) -> purchase.getAmount() <= 500;
 	}
+	
+	
 
 }
